@@ -1,0 +1,10 @@
+{
+    "image_location": null,
+    "output_path": null,
+    "image_resolution": 64,
+    "resize_resolution": null,
+    "start_index_x": 0,
+    "start_index_y": 0,
+    "crop_count_x": 100,
+    "crop_count_y": 100
+}
