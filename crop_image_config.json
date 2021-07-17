@@ -1,9 +1,0 @@
-{
-    "image_location": "D:\\Richard\\AI-DESIGN\\AIDesign_Data\\D063\\D063.tif",
-    "output_path": "D:\\Richard\\AI-DESIGN\\AIDesign_Data\\D063_Cropped",
-    "image_resolution": 64,
-    "start_index_x": 0,
-    "start_index_y": 0,
-    "crop_count_x": 100,
-    "crop_count_y": 100
-}
