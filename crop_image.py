@@ -37,6 +37,7 @@ def main():
 
     pil_image.MAX_IMAGE_PIXELS = 40000 * 30000
     image = pil_image.open(image_location)
+    image_name = os.path.splitext(os.path.basename(image_location))[0]
     print(f"Image location: {image_location}")
 
     if os.path.exists(output_path):
@@ -57,7 +58,11 @@ def main():
         index_x = start_index_x
         while count_x < crop_count_x and index_x + image_resolution <= width:
             box = (index_x, index_y, index_x + image_resolution, index_y + image_resolution)
-            name = f"res-{image_resolution}_at-{index_x}-{index_y}.jpg"
+            name = image_name
+            name += f"_res-{image_resolution}_at-{index_x}-{index_y}"
+            if resize_resolution is not None:
+                name += f"_resize-{resize_resolution}"
+            name += ".jpg"
             location = str(Path(output_path + "/" + name).absolute())
             cropped_image = image.crop(box)
             if resize_resolution is not None:
@@ -73,7 +78,8 @@ def main():
             index_x += image_resolution
         count_y += 1
         index_y += image_resolution
-    print(f"Completed image cropping; Saved {total_count} cropped images")
+    print(f"Saved {total_count} cropped images")
+    print("Completed image cropping")
 
 
 if __name__ == '__main__':
