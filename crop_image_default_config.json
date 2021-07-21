@@ -1,7 +1,7 @@
 {
     "image_location": null,
     "output_path": null,
-    "image_resolution": 64,
+    "crop_resolution": 64,
     "resize_resolution": null,
     "start_index_x": 0,
     "start_index_y": 0,
