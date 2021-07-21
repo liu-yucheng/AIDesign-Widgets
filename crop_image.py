@@ -30,7 +30,7 @@ def main():
     output_path = config["output_path"]
     if output_path is None:
         raise ValueError("output_path cannot be None")
-    image_resolution = config["image_resolution"]
+    crop_resolution = config["crop_resolution"]
     resize_resolution = config["resize_resolution"]
     start_index_x, start_index_y = config["start_index_x"], config["start_index_y"]
     crop_count_x, crop_count_y = config["crop_count_x"], config["crop_count_y"]
@@ -53,13 +53,13 @@ def main():
     count_x, count_y, total_count = 0, 0, 0
     index_x, index_y = start_index_x, start_index_y
     width, height = image.size
-    while count_y < crop_count_y and index_y + image_resolution <= height:
+    while count_y < crop_count_y and index_y + crop_resolution <= height:
         count_x = 0
         index_x = start_index_x
-        while count_x < crop_count_x and index_x + image_resolution <= width:
-            box = (index_x, index_y, index_x + image_resolution, index_y + image_resolution)
+        while count_x < crop_count_x and index_x + crop_resolution <= width:
+            box = (index_x, index_y, index_x + crop_resolution, index_y + crop_resolution)
             name = image_name
-            name += f"_res-{image_resolution}_at-{index_x}-{index_y}"
+            name += f"_res-{crop_resolution}_at-{index_x}-{index_y}"
             if resize_resolution is not None:
                 name += f"_resize-{resize_resolution}"
             name += ".jpg"
@@ -75,9 +75,9 @@ def main():
             if total_count == 1 or total_count % 2000 == 0:
                 print(f"Saved {total_count} cropped images")
             count_x += 1
-            index_x += image_resolution
+            index_x += crop_resolution
         count_y += 1
-        index_y += image_resolution
+        index_y += crop_resolution
     print(f"Saved {total_count} cropped images")
     print("Completed image cropping")
 
