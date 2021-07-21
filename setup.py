@@ -9,7 +9,7 @@ import setuptools
 
 setuptools.setup(
     name="aidesign-utils",
-    version="0.2.1",
+    version="0.2.2",
     description="AI Design utils application.",
     author="AI Design Team",
     packages=setuptools.find_packages(),
