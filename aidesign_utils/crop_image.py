@@ -35,7 +35,7 @@ def main():
     start_index_x, start_index_y = config["start_index_x"], config["start_index_y"]
     crop_count_x, crop_count_y = config["crop_count_x"], config["crop_count_y"]
 
-    pil_image.MAX_IMAGE_PIXELS = 40000 * 30000
+    pil_image.MAX_IMAGE_PIXELS = 60000 * 60000
     image = pil_image.open(image_location)
     image_name = os.path.splitext(os.path.basename(image_location))[0]
     print(f"Image location: {image_location}")
