@@ -11,7 +11,7 @@ import setuptools
 def main():
     setuptools.setup(
         name="aidesign-utils",
-        version="0.3.0",
+        version="0.3.1",
         description="AI Design utils application.",
         author="AI Design Team",
         packages=setuptools.find_packages(),
