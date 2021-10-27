@@ -1,2 +1,4 @@
-# AIDesign_Utils
-AI Design utils (utilities) application.
+# AIDesign-Widgets
+
+AIDesign project widgets.
+

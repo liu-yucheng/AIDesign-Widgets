@@ -1,5 +1,5 @@
 # Other ignored files
-aidesign_utils/crop_image_config.json
+**/aidesign_widgets_configs/
 
 # Byte-compiled / optimized / DLL files
 **/__pycache__/
