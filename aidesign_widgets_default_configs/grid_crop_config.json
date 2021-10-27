@@ -3,8 +3,8 @@
     "output_path": null,
     "crop_resolution": 64,
     "resize_resolution": null,
-    "start_index_x": 0,
-    "start_index_y": 0,
-    "crop_count_x": 100,
-    "crop_count_y": 100
+    "start_position_x": 0,
+    "start_position_y": 0,
+    "max_crop_count_x": null,
+    "max_crop_count_y": null
 }
