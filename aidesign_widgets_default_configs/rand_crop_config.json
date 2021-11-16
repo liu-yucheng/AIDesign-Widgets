@@ -2,7 +2,7 @@
     "image_location": null,
     "output_path": null,
     "manual_seed": null,
-    "random_mirroring": false,
+    "random_flipping": false,
     "crop_resolution": 64,
     "resize_resolution": null,
     "crop_count": 1000
