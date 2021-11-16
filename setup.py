@@ -13,7 +13,7 @@ import shutil
 def main():
     setuptools.setup(
         name="aidesign-widgets",
-        version="0.4.0",
+        version="0.4.1",
         description="AI Design project widgets.",
         author="The AI Design Team",
         packages=setuptools.find_packages(),
