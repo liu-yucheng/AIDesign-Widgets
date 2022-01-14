@@ -7,7 +7,7 @@ Last updated by: liu-yucheng
 
 # AIDesign-Widgets
 
-AI Design widget application collection.
+AIDesign widget application collection.
 
 # Installing The App Using `pip`
 
