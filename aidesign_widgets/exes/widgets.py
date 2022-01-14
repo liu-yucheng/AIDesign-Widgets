@@ -1,6 +1,8 @@
 """The "widgets" command executable."""
 
-# Initially added by: liu-yucheng
+# Copyright (C) 2022 Yucheng Liu. GNU GPL Version 3.
+# GNU GPL Version 3 copy: https://www.gnu.org/licenses/gpl-3.0.txt
+# First added by: liu-yucheng
 # Last updated by: liu-yucheng
 
 import copy
@@ -60,17 +62,21 @@ def _run_command():
         print(unknown_arg_info.format(command), end="")
         exit(1)
     elif command == "help":
-        from aidesign_widgets import help
-        help.argv_copy = argv_copy
-        help.run()
+        from aidesign_widgets.exes import widgets_help
+        widgets_help.argv_copy = argv_copy
+        widgets_help.run()
     elif command == "grid-crop":
-        from aidesign_widgets import grid_crop
-        grid_crop.argv_copy = argv_copy
-        grid_crop.run()
+        from aidesign_widgets.exes import widgets_grid_crop
+        widgets_grid_crop.argv_copy = argv_copy
+        widgets_grid_crop.run()
     elif command == "rand-crop":
-        from aidesign_widgets import rand_crop
-        rand_crop.argv_copy = argv_copy
-        rand_crop.run()
+        from aidesign_widgets.exes import widgets_rand_crop
+        widgets_rand_crop.argv_copy = argv_copy
+        widgets_rand_crop.run()
+    elif command == "path-name":
+        from aidesign_widgets.exes import widgets_path_name
+        widgets_path_name.argv_copy = argv_copy
+        widgets_path_name.run()
     else:
         print(unknown_command_info.format(command), end="")
         exit(1)

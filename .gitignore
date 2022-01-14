@@ -1,5 +1,9 @@
-# Other ignored files
+# Default ignored file name pattern
+**/.*/
+
+# Project specific ignored files
 **/aidesign_widgets_configs/
+**/.vscode/
 
 # Byte-compiled / optimized / DLL files
 **/__pycache__/

@@ -1,23 +1,24 @@
-"""The "widgets rand-crop" command executable."""
+""""widgets grid-crop" command executable."""
 
-# Initially added by: liu-yucheng
+# Copyright (C) 2022 Yucheng Liu. GNU GPL Version 3.
+# GNU GPL Version 3 copy: https://www.gnu.org/licenses/gpl-3.0.txt
+# First added by: liu-yucheng
 # Last updated by: liu-yucheng
 
 from PIL import Image
 import copy
 import datetime
 import os
-import random
 import sys
 
-from aidesign_widgets import defaults
-from aidesign_widgets import utils
+from aidesign_widgets.libs import defaults
+from aidesign_widgets.libs import utils
 
 pil_image = Image
 
 # Private attributes ...
 
-_brief_usage = "widgets rand-crop"
+_brief_usage = "widgets grid-crop"
 _usage = fr"""Usage: {_brief_usage}
 Help: widgets help"""
 _timeout = 10
@@ -77,28 +78,6 @@ def _start_cropping():
     output_path = os.path.abspath(output_path)
     print(f"Output path: {output_path}")
 
-    # read random seed
-    manual_seed = config["manual_seed"]
-    seed = manual_seed
-    if manual_seed is None:
-        random.seed(None)
-        seed = random.randint(0, 2 ** 32 - 1)
-    else:
-        seed = int(manual_seed) % (2 ** 32 - 1)
-    random.seed(seed)
-    if manual_seed is None:
-        print(f"Auto random seed: {seed}")
-    else:
-        print(f"Manual random seed: {seed}")
-
-    # read random flipping switch
-    random_flipping = config["random_flipping"]
-    if random_flipping is None:
-        random_flipping = False
-    else:
-        random_flipping = bool(random_flipping)
-    print(f"Random flipping mode: {random_flipping}")
-
     # read crop resolution
     crop_resolution = config["crop_resolution"]
     if crop_resolution is None:
@@ -119,14 +98,45 @@ def _start_cropping():
     else:
         print(f"Resize resolution: {resize_resolution}")
 
-    # read crop count
-    crop_count = config["crop_count"]
-    if crop_count is None:
-        raise ValueError("crop_count cannot be None")
-    crop_count = int(crop_count)
-    if crop_count < 0:
-        raise ValueError("crop_count needs to be >= 0")
-    print(f"Crop count: {crop_count}")
+    # read start position x
+    start_position_x = config["start_position_x"]
+    if start_position_x is None:
+        start_position_x = 0
+    else:
+        start_position_x = int(start_position_x)
+    if start_position_x < 0:
+        raise ValueError("start_position_x (when set) needs to be >= 0")
+    print(f"Start position X: {start_position_x}")
+
+    # read start position y
+    start_position_y = config["start_position_y"]
+    if start_position_y is None:
+        start_position_y = 0
+    else:
+        start_position_y = int(start_position_y)
+    if start_position_y < 0:
+        raise ValueError("start_position_y (when set) needs to be >= 0")
+    print(f"Start position Y: {start_position_y}")
+
+    # read max crop count x
+    max_crop_count_x = config["max_crop_count_x"]
+    if max_crop_count_x is None:
+        max_crop_count_x = sys.maxsize
+    else:
+        max_crop_count_x = int(max_crop_count_x)
+    if max_crop_count_x < 0:
+        raise ValueError("max_crop_count_x (when set) needs to be >= 0")
+    print(f"Max crop count X: {max_crop_count_x}")
+
+    # read max crop count y
+    max_crop_count_y = config["max_crop_count_y"]
+    if max_crop_count_y is None:
+        max_crop_count_y = sys.maxsize
+    else:
+        max_crop_count_y = int(max_crop_count_y)
+    if max_crop_count_y < 0:
+        raise ValueError("max_crop_count_y (when set) needs to be >= 0")
+    print(f"Max crop count Y: {max_crop_count_y}")
 
     # edit PIL max image pixels to avoid zip bomb detection false alarm
     pil_image.MAX_IMAGE_PIXELS = 65535 * 65535
@@ -141,57 +151,47 @@ def _start_cropping():
     os.makedirs(output_path, exist_ok=True)
 
     # start actual cropping
+    count_x = 0
+    count_y = 0
     total_count = 0
+    pos_x = start_position_x
+    pos_y = start_position_y
     width, height = image.size
-    min_pos_x = 0
-    max_pos_x = width - crop_resolution
-    min_pos_y = 0
-    max_pos_y = height - crop_resolution
-
     print("Started image cropping")
 
-    while total_count < crop_count:
-        pos_x = random.randint(min_pos_x, max_pos_x)
-        pos_y = random.randint(min_pos_y, max_pos_y)
+    while count_y < max_crop_count_y and pos_y + crop_resolution <= height:
+        count_x = 0
+        pos_x = start_position_x
 
-        flip_around_x = False
-        flip_around_y = False
-        if random_flipping:
-            flip_around_x = bool(random.randint(0, 1))
-            flip_around_y = bool(random.randint(0, 1))
+        while count_x < max_crop_count_x and pos_x + crop_resolution <= width:
+            box = (pos_x, pos_y, pos_x + crop_resolution, pos_y + crop_resolution)
 
-        box = (pos_x, pos_y, pos_x + crop_resolution, pos_y + crop_resolution)
+            name = image_name
+            name += f"-At-{pos_x}-{pos_y}-Crop-{crop_resolution}"
+            if resize_resolution is not None:
+                name += f"-Resize-{resize_resolution}"
+            now = datetime.datetime.now()
+            timestamp = f"-Time-{now.year:04}{now.month:02}{now.day:02}-{now.hour:02}{now.minute:02}{now.second:02}-"\
+                f"{now.microsecond:06}"
+            name += timestamp
+            name += ".jpg"
 
-        name = image_name
-        name += f"-At-{pos_x}-{pos_y}-Crop-{crop_resolution}"
-        if resize_resolution is not None:
-            name += f"-Resize-{resize_resolution}"
-        if flip_around_x or flip_around_y:
-            name += "-FlippedAround-"
-            if flip_around_x:
-                name += "X"
-            if flip_around_y:
-                name += "Y"
-        now = datetime.datetime.now()
-        timestamp = f"-Time-{now.year:04}{now.month:02}{now.day:02}-{now.hour:02}{now.minute:02}{now.second:02}-"\
-            f"{now.microsecond:06}"
-        name += timestamp
-        name += ".jpg"
+            location = os.path.join(output_path, name)
+            cropped = image.crop(box)
+            if resize_resolution is not None:
+                cropped = cropped.resize(size=(resize_resolution, resize_resolution), resample=pil_image.BICUBIC)
+            cropped.save(location, quality=95)
 
-        location = os.path.join(output_path, name)
-        cropped = image.crop(box)
-        if resize_resolution is not None:
-            cropped = cropped.resize(size=(resize_resolution, resize_resolution), resample=pil_image.BICUBIC)
-        if flip_around_x:
-            cropped = cropped.transpose(pil_image.FLIP_TOP_BOTTOM)
-        if flip_around_y:
-            cropped = cropped.transpose(pil_image.FLIP_LEFT_RIGHT)
-        cropped.save(location, quality=95)
+            total_count += 1
+            if total_count == 1 or total_count % 500 == 0:
+                print(f"Saved {total_count} cropped images")
 
-        total_count += 1
-        if total_count == 1 or total_count % 500 == 0:
-            print(f"Saved {total_count} cropped images")
+            count_x += 1
+            pos_x += crop_resolution
+        # end while
 
+        count_y += 1
+        pos_y += crop_resolution
     # end while
 
     print(f"Saved {total_count} cropped images")
@@ -206,7 +206,7 @@ def run():
     argv_copy_length = len(argv_copy)
     assert argv_copy_length >= 0
     if argv_copy_length == 0:
-        config_loc = defaults.rand_crop_config_loc
+        config_loc = defaults.grid_crop_config_loc
         print(info.format(config_loc), end="")
 
         timed_input = utils.TimedInput()
