@@ -26,7 +26,7 @@ _setup = setuptools.setup
 def main():
     _setup(
         name="aidesign-widgets",
-        version="0.5.1",
+        version="0.5.2",
         description="AIDesign Widget Application Collection",
         author="Yucheng Liu (From The AIDesign Team)",
         packages=_find_packages(),
@@ -37,9 +37,6 @@ def main():
         }  # ,
         # test_suite="tests"
     )
-
-    # Test the main command executable module availability
-    from aidesign_widgets.exes import widgets as _
 
     # Initialize the configs with the defaults when necessary
     from aidesign_widgets.libs import defaults
