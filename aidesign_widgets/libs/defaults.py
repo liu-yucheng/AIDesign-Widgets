@@ -1,6 +1,7 @@
 """Default values.
 
-Edit only when necessary.
+Not supposed to be changed.
+Change only if you know what you are doing.
 """
 
 # Copyright 2022 Yucheng Liu. GNU GPL3 license.
@@ -21,12 +22,12 @@ _repo_path = str(_Path(_main_package_path).parent)
 
 default_configs_path = _join(_repo_path, "aidesign_widgets_default_configs")
 """Default configs path."""
+default_cmd_configs_path = _join(default_configs_path, "command_configs")
+"""Default command configs path."""
 
-configs_path = _join(_repo_path, "aidesign_widgets_configs")
-"""Configs path."""
-
-grid_crop_config_loc = _join(configs_path, "grid_crop_config.json")
-""""grid-crop" config location."""
-
-rand_crop_config_loc = _join(configs_path, "rand_crop_config.json")
-""""rand-crop" config location."""
+cmd_configs_path = _join(_repo_path, "aidesign_widgets_command_configs")
+"""Command configs path."""
+grid_crop_config_name = "grid_crop_config.json"
+""""grid-crop" config name."""
+rand_crop_config_name = "rand_crop_config.json"
+""""rand-crop" config name."""
