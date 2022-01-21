@@ -2,7 +2,8 @@
 **/.*/
 
 # Project specific ignored files
-**/aidesign_widgets_configs/
+**/aidesign_widgets_command_configs/
+**/.aidesign_widgets_test_data
 **/.vscode/
 
 # Byte-compiled / optimized / DLL files
