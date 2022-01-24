@@ -17,7 +17,7 @@ _join = ospath.join
 _Path = pathlib.Path
 _stderr = sys.stderr
 
-brief_usage = "widgets path-name <path name>"
+brief_usage = "widgets path-name <relative-path>"
 """Brief usage."""
 usage = str(
     f"Usage: {brief_usage}\n"
