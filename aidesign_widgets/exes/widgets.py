@@ -1,4 +1,4 @@
-"""The "widgets" command executable."""
+""""widgets" command executable."""
 
 # Copyright 2022 Yucheng Liu. GNU GPL3 license.
 # GNU GPL3 license copy: https://www.gnu.org/licenses/gpl-3.0.txt
@@ -9,57 +9,80 @@ import copy
 import pkg_resources
 import sys
 
-# Private attributes ...
+_argv = sys.argv
+_deepcopy = copy.deepcopy
+_stderr = sys.stderr
 
-# Init _version
+# Initialize _version
 _version = "<unknown version>"
-_packages = pkg_resources.require("aidesign-widgets")
-if len(_packages) > 0:
-    _version = _packages[0].version
 
-_brief_usage = "widgets <command> ..."
-_usage = fr"""Usage: {_brief_usage}
-Help: widgets help"""
+try:
+    _packages = pkg_resources.require("aidesign-widgets")
 
-# ... Private attributes
-# Nominal info strings ...
+    if len(_packages) > 0:
+        _version = _packages[0].version
 
-info = fr"""AIDesign-Widgets (aidesign-widgets) {_version}
-{_usage}
+except Exception as _:
+    pass
+# end try
+
+brief_usage = "widgets <command> ..."
+"""Brief usage."""
+
+usage = fr"""
+
+Usage: {brief_usage}
+Help: widgets help
+
 """
-"""The primary info to display."""
+"""Usage."""
+usage = usage.strip()
 
-# ... Nominal info strings
-# Error info strings ...
+info = fr"""
 
-unknown_command_info = f"\"{_brief_usage}\""r""" gets an unknown command: {}"""fr"""
-{_usage}
+AIDesign-Widgets (aidesign-widgets) {_version}
+{usage}
+
 """
-"""The info to display when the executable gets an unknown command."""
+"""Primary info to display."""
+info = info.strip()
 
-unknown_arg_info = f"\"{_brief_usage}\""r""" gets an unknown argument: {}"""fr"""
-{_usage}
+unknown_cmd_info = fr"""
+
+"{brief_usage}" gets an unknown command: {{}}
+{usage}
+
 """
-"""The info to display when the executable gets an unknown argument."""
+"""Info to display when getting an unknown command."""
+unknown_cmd_info = unknown_cmd_info.strip()
 
-# ... Error info strings
-# Other public attributes ...
+unknown_arg_info = fr"""
+
+"{brief_usage}" gets an unknown argument: {{}}
+{usage}
+
+"""
+"""Info to display when getting an unknown argument."""
+unknown_arg_info = unknown_arg_info.strip()
 
 argv_copy = None
-"""A consumable copy of sys.argv."""
-
-# ... Other public attributes
+"""Consumable copy of sys.argv."""
 
 
 def _run_command():
     global argv_copy
+    argv_copy = list(argv_copy)
+
     assert len(argv_copy) > 0
+
     command = argv_copy.pop(0)
+    command = str(command)
+
     if len(command) <= 0:
-        print(unknown_command_info.format(command), end="")
+        print(unknown_cmd_info.format(command), file=_stderr)
         exit(1)
     elif command[0] == "-":
-        print(unknown_arg_info.format(command), end="")
+        print(unknown_arg_info.format(command), file=_stderr)
         exit(1)
     elif command == "help":
         from aidesign_widgets.exes import widgets_help
@@ -78,25 +101,26 @@ def _run_command():
         widgets_path_name.argv_copy = argv_copy
         widgets_path_name.run()
     else:
-        print(unknown_command_info.format(command), end="")
+        print(unknown_cmd_info.format(command), file=_stderr)
         exit(1)
+    # end if
 
 
 def main():
     """Starts the executable."""
     global argv_copy
-    argv_length = len(sys.argv)
+    argv_length = len(_argv)
+
     assert argv_length >= 1
+
     if argv_length == 1:
-        print(info, end="")
+        print(info)
         exit(0)
-    # elif argv_length > 1
-    else:
-        argv_copy = copy.deepcopy(sys.argv)
+    else:  # elif argv_length > 1:
+        argv_copy = _deepcopy(_argv)
         argv_copy.pop(0)
         _run_command()
 
 
-# Let main be the script entry point
 if __name__ == '__main__':
     main()
