@@ -26,7 +26,7 @@ _setup = setuptools.setup
 def main():
     _setup(
         name="aidesign-widgets",
-        version="0.9.1",
+        version="0.10.0",
         description="AIDesign Widget Application Collection",
         author="Yucheng Liu (From The AIDesign Team)",
         packages=_find_packages(),
@@ -45,6 +45,9 @@ def main():
         _copytree(defaults.default_cmd_configs_path, defaults.cmd_configs_path)
 
     print(f"Configs ensured at: {defaults.cmd_configs_path}")
+
+    # Check main command availability
+    from aidesign_widgets.exes import widgets as _
     print("Commands available: widgets")
 
 
