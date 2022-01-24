@@ -21,13 +21,14 @@ _abspath = ospath.abspath
 _argv = sys.argv
 _basename = ospath.basename
 _deepcopy = copy.deepcopy
-_load_json = utils.load_json
 _join = ospath.join
+_load_json = utils.load_json
 _makedirs = os.makedirs
 _now = datetime.datetime.now
 _pil_image = Image
 _pil_image_open = Image.open
 _split_text = ospath.splitext
+_stderr = sys.stderr
 _TimedInput = utils.TimedInput
 
 brief_usage = "widgets grid-crop"
@@ -46,7 +47,7 @@ timeout = float(10)
 
 info = fr"""
 
-"{brief_usage}":
+"{brief_usage}" command config:
 {{}}
 -
 Please confirm the above config file contents
@@ -329,13 +330,14 @@ def run():
         print("-")
         if answer.lower() == "yes" or answer.lower() == "y":
             _start_cropping()
-        else:  # elif answer.lower() == "no" or answer.lower() == "n" or answer = Others:
+        else:  # elif answer.lower() == "no" or answer.lower() == "n" or answer is Others:
             print(aborted_info)
 
         exit(0)
     else:  # elif argv_copy_length > 0:
-        print(too_many_args_info.format(argv_copy_length))
+        print(too_many_args_info.format(argv_copy_length), file=_stderr)
         exit(1)
+    # end if
 
 
 def main():

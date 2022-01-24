@@ -15,6 +15,10 @@ import threading
 
 import json
 
+# randbool imports
+
+import random
+
 # TimedInput aliases
 
 _create_subprocess_exec = asyncio.create_subprocess_exec
@@ -28,6 +32,10 @@ _Thread = threading.Thread
 
 _jsonload = json.load
 _jsondump = json.dump
+
+# randbool aliases
+
+_randint = random.randint
 
 #
 
@@ -133,3 +141,20 @@ def save_json(from_dict, to_file):
     file = open(to_file, "w+")
     _jsondump(from_dict, file, indent=4)
     file.close()
+
+
+def rand_bool():
+    """Produce a random boolean value.
+
+    This is like flipping a fair coin.
+
+    Returns:
+        result: the random boolean
+    """
+
+    # Part of LYC-PythonUtils
+    # Copyright 2022 Yucheng Liu. GNU GPL3 license.
+    # GNU GPL3 license copy: https://www.gnu.org/licenses/gpl-3.0.txt
+
+    result = bool(_randint(0, 1))
+    return result
