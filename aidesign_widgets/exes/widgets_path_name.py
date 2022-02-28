@@ -13,6 +13,7 @@ from os import path as ospath
 
 _argv = sys.argv
 _deepcopy = copy.deepcopy
+_isabs = ospath.isabs
 _join = ospath.join
 _Path = pathlib.Path
 _stderr = sys.stderr
@@ -58,7 +59,9 @@ def run():
         path_name = argv_copy.pop(0)
         path_name = str(path_name)
 
-        path_name = _join(".", path_name)
+        if not _isabs(path_name):
+            path_name = _join(".", path_name)
+
         path_name = str(_Path(path_name).resolve())
 
         path_name = repr(path_name)[1: -1]
