@@ -227,6 +227,13 @@ def _find_img_fname(img_name, pos_x, pos_y, crop_res, resize_res):
 
 
 def _start_cropping():
+    info = str(
+        "Started preparation\n"
+        "-"
+    )
+
+    print(info)
+
     # Parse config
     config = _load_json(config_loc)
 
@@ -259,10 +266,23 @@ def _start_cropping():
     img = _pil_image_open(imgloc)
     img_name = _split_text(_basename(imgloc))[0]
     print("Completed loading image")
-    print("-")
 
     # Ensure output folder
     _makedirs(outpath, exist_ok=True)
+
+    info = str(
+        "-\n"
+        "Completed preparation"
+    )
+
+    print(info)
+
+    info = str(
+        "Started grid cropping\n"
+        "-"
+    )
+
+    print(info)
 
     # Start actual cropping
     count_x = 0
@@ -271,7 +291,6 @@ def _start_cropping():
     pos_x = start_pos_x
     pos_y = start_pos_y
     width, height = img.size
-    print("Started image cropping")
 
     while count_y < max_crop_count_y and pos_y + crop_res <= height:
         count_x = 0
@@ -302,7 +321,13 @@ def _start_cropping():
     # end while
 
     print(f"Saved {total_count} cropped images")
-    print("Completed image cropping")
+
+    info = str(
+        "-\n"
+        "Completed grid cropping"
+    )
+
+    print(info)
 
 
 def run():
