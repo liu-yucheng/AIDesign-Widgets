@@ -10,6 +10,8 @@ import datetime
 import os
 import random
 import sys
+import traceback
+import typing
 
 from os import path as ospath
 from PIL import Image
@@ -21,17 +23,27 @@ _abspath = ospath.abspath
 _argv = sys.argv
 _basename = ospath.basename
 _deepcopy = copy.deepcopy
+_flushlogs = utils.flushlogs
+_format_exc = traceback.format_exc
+_IO = typing.IO
 _join = ospath.join
 _load_json = utils.load_json
+_logln = utils.logln
+_logstr = utils.logstr
 _makedirs = os.makedirs
 _now = datetime.datetime.now
 _pil_image = Image
+# _print_exc = traceback.print_exc  # Debug
 _rand_bool = utils.rand_bool
 _randint = random.randint
 _random_seed = random.seed
 _split_text = ospath.splitext
 _stderr = sys.stderr
+_stdout = sys.stdout
 _TimedInput = utils.TimedInput
+
+timeout = float(10)
+"""Timeout in seconds."""
 
 brief_usage = "widgets rand-crop"
 """Brief usage."""
@@ -41,12 +53,8 @@ usage = fr"""
 Usage: {brief_usage}
 Help: widgets help
 
-"""
+""".strip()
 """Usage."""
-usage = usage.strip()
-
-timeout = float(10)
-"""Timeout in seconds."""
 
 info = fr"""
 
@@ -56,17 +64,39 @@ info = fr"""
 Please confirm the above config file contents
 Do you want to continue? [ Y (Yes) | n (no) ]: < default: Yes, timeout: {timeout} seconds >
 
-"""
+""".strip()
 """Primary info to display."""
-info = info.strip()
+
+will_start_info = fr"""
+
+Will start cropping
+---- The following will be logged to {{}} ----
+
+""".strip()
+"""Info to display before cropping starts."""
+
+stopped_info = fr"""
+
+---- The above has been logged to {{}} ----
+Cropping stopped
+
+""".strip()
+"""Info to display after cropping stops."""
+
+completed_info = fr"""
+
+---- The above has been logged to {{}} ----
+Cropping completed
+
+""".strip()
+"""Info to display after cropping completes."""
 
 aborted_info = fr"""
 
 Aborted the image cropping process
 
-"""
+""".strip()
 """Info to display when the user aborts the cropping process."""
-aborted_info = aborted_info.strip()
 
 too_many_args_info = fr"""
 
@@ -74,14 +104,15 @@ too_many_args_info = fr"""
 Expects 0 arguments; Gets {{}} arguments
 {usage}
 
-"""
+""".strip()
 """Info to display when the executable gets too many arguments."""
-too_many_args_info = too_many_args_info.strip()
 
 argv_copy = None
 """Consumable copy of sys.argv."""
 config_loc = None
 """Config location."""
+log_loc = None
+"""Log location."""
 
 
 def _parse_imgloc(config):
@@ -124,6 +155,7 @@ def _parse_rand_seed(config):
         manual_seed = int(manual_seed) % (2 ** 32 - 1)
         manual_seed = int(manual_seed)
         seed = manual_seed
+    # end if
 
     return manual_seed, seed
 
@@ -137,6 +169,7 @@ def _parse_rand_flip(config):
         rand_flip = False
     else:  # elif rand_flip is not None:
         rand_flip = bool(rand_flip)
+    # end if
 
     return rand_flip
 
@@ -203,6 +236,7 @@ def _find_img_fname(img_name, pos_x, pos_y, crop_res, resize_res, flip_around_x,
         resize_res = None
     else:  # elif resize_res is not None:
         resize_res = int(resize_res)
+    # end if
 
     flip_around_x = bool(flip_around_x)
     flip_around_y = bool(flip_around_y)
@@ -214,6 +248,7 @@ def _find_img_fname(img_name, pos_x, pos_y, crop_res, resize_res, flip_around_x,
         resize_tag = ""
     else:  # elif resize_res is not None:
         resize_tag = f"-Resize-{resize_res}"
+    # end if
 
     if flip_around_x or flip_around_y:
         flip_axes = ""
@@ -227,54 +262,61 @@ def _find_img_fname(img_name, pos_x, pos_y, crop_res, resize_res, flip_around_x,
         flip_tag = f"-FlippedAround-{flip_axes}"
     else:  # elif not (flip_around_x or flip_around_y):
         flip_tag = ""
+    # end if
 
     now = _now()
+
     timestamp = str(
         f"-Time-{now.year:04}{now.month:02}{now.day:02}-{now.hour:02}{now.minute:02}{now.second:02}-"
         f"{now.microsecond:06}"
     )
+
     fext = ".jpg"
 
     fname = f"{img_name}{pos_tag}{crop_tag}{resize_tag}{flip_tag}{timestamp}{fext}"
     return fname
 
 
-def _start_cropping():
+def _prep_and_crop(logs):
+    logs: list[_IO] = logs
+
     info = str(
         "Started preparation\n"
         "-"
     )
 
-    print(info)
+    _logln(logs, info)
 
     # Parse config
     config = _load_json(config_loc)
 
     imgloc = _parse_imgloc(config)
-    print(f"Image location: {imgloc}")
+    _logln(logs, f"Image location: {imgloc}")
     outpath = _parse_outpath(config)
-    print(f"Output path: {outpath}")
+    _logln(logs, f"Output path: {outpath}")
     manual_seed, seed = _parse_rand_seed(config)
     _random_seed(seed)
 
     if manual_seed is None:
-        print(f"Auto random seed: {seed}")
+        _logln(logs, f"Auto random seed: {seed}")
     else:
-        print(f"Manual random seed: {seed}")
+        _logln(logs, f"Manual random seed: {seed}")
+    # end if
 
     rand_flip = _parse_rand_flip(config)
-    print(f"Random flipping mode: {rand_flip}")
+    _logln(logs, f"Random flipping mode: {rand_flip}")
     crop_res = _parse_crop_res(config)
-    print(f"Crop resolution: {crop_res}")
+    _logln(logs, f"Crop resolution: {crop_res}")
     resize_res = _parse_resize_res(config)
 
     if resize_res is None:
-        print("No resize, keep crop resolution")
+        _logln(logs, "No resize, keep crop resolution")
     else:
-        print(f"Resize resolution: {resize_res}")
+        _logln(logs, f"Resize resolution: {resize_res}")
+    # end if
 
     crop_count = _parse_crop_count(config)
-    print(f"Crop count: {crop_count}")
+    _logln(logs, f"Crop count: {crop_count}")
 
     # Edit PIL max image pixels to avoid zip bomb detection false alarm
     _pil_image.MAX_IMAGE_PIXELS = 65535 * 65535
@@ -282,7 +324,7 @@ def _start_cropping():
     # Read image
     img = _pil_image.open(imgloc)
     img_name = _split_text(_basename(imgloc))[0]
-    print("Completed loading image")
+    _logln(logs, "Completed loading image")
 
     # Ensure output folder
     _makedirs(outpath, exist_ok=True)
@@ -292,14 +334,14 @@ def _start_cropping():
         "Completed preparation"
     )
 
-    print(info)
+    _logln(logs, info)
 
     info = str(
         "Started random cropping\n"
         "-"
     )
 
-    print(info)
+    _logln(logs, info)
 
     # Start actual cropping
     total_count = 0
@@ -340,24 +382,72 @@ def _start_cropping():
         total_count += 1
 
         if total_count == 1 or total_count % 500 == 0:
-            print(f"Saved {total_count} cropped images")
+            _logln(logs, f"Saved {total_count} cropped images")
 
     # end while
 
-    print(f"Saved {total_count} cropped images")
+    _logln(logs, f"Saved {total_count} cropped images")
 
     info = str(
         "-\n"
         "Completed random cropping"
     )
 
-    print(info)
+    _logln(logs, info)
+    _flushlogs(logs)
+
+
+def _start_cropping():
+    global log_loc
+
+    start_time = _now()
+    log_file: _IO = open(log_loc, "a+")
+    all_logs = [_stdout, log_file]
+    err_logs = [_stderr, log_file]
+
+    info = str(
+        "AIDesign-Widgets random cropping\n"
+        "-"
+    )
+
+    _logln(all_logs, info)
+
+    try:
+        _prep_and_crop(all_logs)
+    except BaseException as base_exception:
+        _logstr(err_logs, _format_exc())
+        end_time = _now()
+        exe_time = end_time - start_time
+
+        info = str(
+            f"-\n"
+            f"Execution stopped after: {exe_time} (days, hours: minutes: seconds)\n"
+            f"-"
+        )
+
+        _logln(all_logs, info)
+        log_file.close()
+        raise base_exception
+    # end try
+
+    end_time = _now()
+    exe_time = end_time - start_time
+
+    info = str(
+        f"-\n"
+        f"Execution time: {exe_time} (days, hours: minutes: seconds)\n"
+        f"-"
+    )
+
+    _logln(all_logs, info)
+    log_file.close()
 
 
 def run():
     """Runs the executable as a command."""
     global argv_copy
     global config_loc
+    global log_loc
     argv_copy_length = len(argv_copy)
 
     assert argv_copy_length >= 0
@@ -375,13 +465,31 @@ def run():
         elif len(answer) <= 0:
             answer = "Yes"
             print(f"{answer} (default)")
+        # end if
 
         print("-")
 
         if answer.lower() == "yes" or answer.lower() == "y":
-            _start_cropping()
+            log_loc = _join(defaults.app_data_path, "log.txt")
+            print(will_start_info.format(log_loc))
+
+            try:
+                _start_cropping()
+            except BaseException as base_exception:
+                # _print_exc()  # Debug
+                exit_code = 1
+
+                if isinstance(base_exception, SystemExit):
+                    exit_code = base_exception.code
+
+                print(stopped_info.format(log_loc), file=_stderr)
+                exit(exit_code)
+            # end try
+
+            print(completed_info.format(log_loc))
         else:  # elif answer.lower() == "no" or answer.lower() == "n" or answer is Others:
             print(aborted_info)
+        # end if
 
         exit(0)
     else:  # elif argv_copy_length > 0:
