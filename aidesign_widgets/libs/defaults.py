@@ -22,10 +22,10 @@ _repo_path = str(_Path(_main_package_path).parent)
 
 default_configs_path = _join(_repo_path, "aidesign_widgets_default_configs")
 """Default configs path."""
-default_cmd_configs_path = _join(default_configs_path, "command_configs")
+default_app_data_path = _join(default_configs_path, "app_data")
 """Default command configs path."""
 
-cmd_configs_path = _join(_repo_path, "aidesign_widgets_command_configs")
+app_data_path = _join(_repo_path, "aidesign_widgets_app_data")
 """Command configs path."""
 grid_crop_config_name = "grid_crop_config.json"
 """"grid-crop" config name."""

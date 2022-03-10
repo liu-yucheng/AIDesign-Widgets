@@ -339,7 +339,7 @@ def run():
     assert argv_copy_length >= 0
 
     if argv_copy_length == 0:
-        config_loc = _join(defaults.cmd_configs_path, defaults.grid_crop_config_name)
+        config_loc = _join(defaults.app_data_path, defaults.grid_crop_config_name)
         print(info.format(config_loc))
 
         timed_input = _TimedInput()
