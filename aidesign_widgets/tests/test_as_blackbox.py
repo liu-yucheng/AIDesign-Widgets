@@ -46,13 +46,13 @@ _test_data_path = _join(_repo_path, ".aidesign_widgets_test_data")
 _default_configs_path = _join(_repo_path, "aidesign_widgets_default_configs")
 _default_test_data_path = _join(_default_configs_path, "test_data")
 
-_cmd_configs_path = _join(_repo_path, "aidesign_widgets_command_configs")
-_grid_crop_config_loc = _join(_cmd_configs_path, "grid_crop_config.json")
-_rand_crop_config_loc = _join(_cmd_configs_path, "rand_crop_config.json")
+_app_data_path = _join(_repo_path, "aidesign_widgets_app_data")
+_grid_crop_config_loc = _join(_app_data_path, "grid_crop_config.json")
+_rand_crop_config_loc = _join(_app_data_path, "rand_crop_config.json")
 
-_default_cmd_configs_path = _join(_default_test_data_path, "command_configs")
-_default_grid_crop_config_loc = _join(_default_cmd_configs_path, "grid_crop_config.json")
-_default_rand_crop_config_loc = _join(_default_cmd_configs_path, "rand_crop_config.json")
+_default_app_data_path = _join(_default_test_data_path, "app_data")
+_default_grid_crop_config_loc = _join(_default_app_data_path, "grid_crop_config.json")
+_default_rand_crop_config_loc = _join(_default_app_data_path, "rand_crop_config.json")
 
 _default_tocrop_path = _join(_default_test_data_path, "to_crop")
 
