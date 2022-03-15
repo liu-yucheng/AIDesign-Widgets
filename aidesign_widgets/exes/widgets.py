@@ -9,11 +9,15 @@ import copy
 import pkg_resources
 import sys
 
+# Aliases
+
 _argv = sys.argv
 _deepcopy = copy.deepcopy
 _stderr = sys.stderr
 
+# -
 # Initialize _version
+
 _version = "<unknown version>"
 
 try:
@@ -26,6 +30,8 @@ except Exception as _:
     pass
 # end try
 
+# -
+
 brief_usage = "widgets <command> ..."
 """Brief usage."""
 
@@ -34,36 +40,32 @@ usage = fr"""
 Usage: {brief_usage}
 Help: widgets help
 
-"""
+""".strip()
 """Usage."""
-usage = usage.strip()
 
 info = fr"""
 
 AIDesign-Widgets (aidesign-widgets) {_version}
 {usage}
 
-"""
+""".strip()
 """Primary info to display."""
-info = info.strip()
 
 unknown_cmd_info = fr"""
 
 "{brief_usage}" gets an unknown command: {{}}
 {usage}
 
-"""
+""".strip()
 """Info to display when getting an unknown command."""
-unknown_cmd_info = unknown_cmd_info.strip()
 
 unknown_arg_info = fr"""
 
 "{brief_usage}" gets an unknown argument: {{}}
 {usage}
 
-"""
+""".strip()
 """Info to display when getting an unknown argument."""
-unknown_arg_info = unknown_arg_info.strip()
 
 argv_copy = None
 """Consumable copy of sys.argv."""
