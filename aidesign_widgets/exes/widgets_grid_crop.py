@@ -5,7 +5,6 @@
 # First added by username: liu-yucheng
 # Last updated by username: liu-yucheng
 
-
 import copy
 import datetime
 import os
@@ -18,6 +17,8 @@ from PIL import Image
 
 from aidesign_widgets.libs import defaults
 from aidesign_widgets.libs import utils
+
+# Aliases
 
 _abspath = ospath.abspath
 _argv = sys.argv
@@ -40,8 +41,7 @@ _stderr = sys.stderr
 _stdout = sys.stdout
 _TimedInput = utils.TimedInput
 
-timeout = float(10)
-"""Timeout in seconds."""
+# -
 
 brief_usage = "widgets grid-crop"
 """Brief usage."""
@@ -53,6 +53,9 @@ Help: widgets help
 
 """.strip()
 """Usage."""
+
+timeout = float(10)
+"""Timeout in seconds."""
 
 info = fr"""
 
