@@ -21,9 +21,8 @@ usage = fr"""
 Usage: {brief_usage}
 Help: widgets help
 
-"""
+""".strip()
 """Usage."""
-usage = usage.strip()
 
 info = fr"""
 
@@ -42,9 +41,8 @@ path-name:
     When:   You want to show a path name as an escaped string with quotes, which can be directly used in JSON.
     How-to: widgets path-name <relative-path>
 
-"""
+""".strip()
 """Primary info to display."""
-info = info.strip()
 
 too_many_args_info = fr"""
 
@@ -52,9 +50,8 @@ too_many_args_info = fr"""
 Expects 0 arguments; Gets {{}} arguments
 {usage}
 
-"""
+""".strip()
 """Info to display when the executable gets too many arguments."""
-too_many_args_info = too_many_args_info.strip()
 
 argv_copy = None
 """Consumable copy of sys.argv."""

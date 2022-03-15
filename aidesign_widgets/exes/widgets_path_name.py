@@ -11,6 +11,8 @@ import sys
 
 from os import path as ospath
 
+# Aliases
+
 _argv = sys.argv
 _deepcopy = copy.deepcopy
 _isabs = ospath.isabs
@@ -18,15 +20,18 @@ _join = ospath.join
 _Path = pathlib.Path
 _stderr = sys.stderr
 
+# -
+
 brief_usage = "widgets path-name <relative-path>"
 """Brief usage."""
+
 usage = str(
     f"Usage: {brief_usage}\n"
     f"Help: widgets help"
 )
 """Usage."""
 
-info = f"{{}}"
+info = "{}"
 """Primary info to display."""
 
 too_few_args_info = str(
@@ -56,6 +61,7 @@ def run():
         print(too_few_args_info.format(argv_copy_length), file=_stderr)
         exit(1)
     elif argv_copy_length == 1:
+        assert argv_copy is not None
         path_name = argv_copy.pop(0)
         path_name = str(path_name)
 
