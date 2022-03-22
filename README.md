@@ -21,10 +21,10 @@ AIDesign widget collection application.
 1. Run the `pip install -e ./` command. This will install the application under the editable mode.
 2. If you change the source code, you do not need to reinstall the package to reflect the changes.
 
-## Deployment Installation
+## ~~Deployment Installation~~ (Temporarily Unavailable)
 
-1. Run the `pip install ./` command. This will install the application.
-2. If you need to update the app or change the code, you will need to reinstall the package.
+1. ~~Run the `pip install ./` command. This will install the application.~~
+2. ~~If you need to update the app or change the code, you will need to reinstall the package.~~
 
 # Usage (From Command Line Shell)
 
@@ -51,6 +51,14 @@ path-name:
     When:   You want to show a path name as an escaped string with quotes, which can be directly used in JSON.
     How-to: widgets path-name <relative-path>
 ```
+
+# Dependencies
+
+See `<this-repo>/requirements.txt`.
+
+# Testing
+
+You can test this application by running `python <this-repo>/test_all.py`.
 
 # Miscellaneous
 ## Developer's Notes :memo: And Warnings :warning:
