@@ -24,6 +24,7 @@ _abspath = ospath.abspath
 _argv = sys.argv
 _basename = ospath.basename
 _deepcopy = copy.deepcopy
+_exit = sys.exit
 _flush_logs = utils.flushlogs
 _format_exc = traceback.format_exc
 _IO = typing.IO
@@ -453,13 +454,14 @@ def run():
                 _start_cropping()
             except BaseException as base_exception:
                 # _print_exc()  # Debug
-                exit_code = 1
 
                 if isinstance(base_exception, SystemExit):
                     exit_code = base_exception.code
+                else:
+                    exit_code = 1
 
                 print(stopped_info.format(log_loc), file=_stderr)
-                exit(exit_code)
+                _exit(exit_code)
             # end try
 
             print(completed_info.format(log_loc))
@@ -467,10 +469,10 @@ def run():
             print(aborted_info)
         # end if
 
-        exit(0)
+        _exit(0)
     else:  # elif argv_copy_length > 0:
         print(too_many_args_info.format(argv_copy_length), file=_stderr)
-        exit(1)
+        _exit(1)
     # end if
 
 

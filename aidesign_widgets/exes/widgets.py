@@ -13,6 +13,7 @@ import sys
 
 _argv = sys.argv
 _deepcopy = copy.deepcopy
+_exit = sys.exit
 _stderr = sys.stderr
 
 # -
@@ -82,10 +83,10 @@ def _run_command():
 
     if len(command) <= 0:
         print(unknown_cmd_info.format(command), file=_stderr)
-        exit(1)
+        _exit(1)
     elif command[0] == "-":
         print(unknown_arg_info.format(command), file=_stderr)
-        exit(1)
+        _exit(1)
     elif command == "help":
         from aidesign_widgets.exes import widgets_help
         widgets_help.argv_copy = argv_copy
@@ -104,7 +105,7 @@ def _run_command():
         widgets_path_name.run()
     else:
         print(unknown_cmd_info.format(command), file=_stderr)
-        exit(1)
+        _exit(1)
     # end if
 
 
@@ -117,7 +118,7 @@ def main():
 
     if argv_length == 1:
         print(info)
-        exit(0)
+        _exit(0)
     else:  # elif argv_length > 1:
         argv_copy = _deepcopy(_argv)
         argv_copy.pop(0)
