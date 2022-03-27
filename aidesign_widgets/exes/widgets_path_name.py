@@ -15,6 +15,7 @@ from os import path as ospath
 
 _argv = sys.argv
 _deepcopy = copy.deepcopy
+_exit = sys.exit
 _isabs = ospath.isabs
 _join = ospath.join
 _Path = pathlib.Path
@@ -59,7 +60,7 @@ def run():
 
     if argv_copy_length <= 0:
         print(too_few_args_info.format(argv_copy_length), file=_stderr)
-        exit(1)
+        _exit(1)
     elif argv_copy_length == 1:
         assert argv_copy is not None
         path_name = argv_copy.pop(0)
@@ -76,7 +77,7 @@ def run():
         print(info.format(path_name))
     else:  # elif argv_copy_length > 1:
         print(too_many_args_info.format(argv_copy_length), file=_stderr)
-        exit(1)
+        _exit(1)
     # end if
 
 
