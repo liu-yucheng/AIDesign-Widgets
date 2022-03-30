@@ -117,34 +117,34 @@ log_loc = None
 """Log location."""
 
 
-def _parse_imgloc(config):
-    config = dict(config)
+def _parse_image_loc(config):
+    config: dict = config
 
-    imgloc = config["image_location"]
+    image_loc = config["image_location"]
 
-    if imgloc is None:
+    if image_loc is None:
         raise ValueError("Image location cannot be None")
 
-    imgloc = str(imgloc)
-    imgloc = _abspath(imgloc)
-    return imgloc
+    image_loc = str(image_loc)
+    image_loc = _abspath(image_loc)
+    return image_loc
 
 
-def _parse_outpath(config):
-    config = dict(config)
+def _parse_out_path(config):
+    config: dict = config
 
-    outpath = config["output_path"]
+    out_path = config["output_path"]
 
-    if outpath is None:
+    if out_path is None:
         raise ValueError("Output path cannot be None")
 
-    outpath = str(outpath)
-    outpath = _abspath(outpath)
-    return outpath
+    out_path = str(out_path)
+    out_path = _abspath(out_path)
+    return out_path
 
 
 def _parse_crop_res(config):
-    config = dict(config)
+    config: dict = config
 
     crop_res = config["crop_resolution"]
 
@@ -163,7 +163,7 @@ def _parse_crop_res(config):
 
 
 def _parse_resize_res(config):
-    config = dict(config)
+    config: dict = config
 
     resize_res = config["resize_resolution"]
 
@@ -183,7 +183,7 @@ def _parse_resize_res(config):
 
 
 def _parse_start_pos(config, key):
-    config = dict(config)
+    config: dict = config
     key = str(key)
 
     start_pos = config[key]
@@ -192,6 +192,7 @@ def _parse_start_pos(config, key):
         start_pos = 0
     else:  # elif start_pos is not None:
         start_pos = int(start_pos)
+    # end if
 
     if start_pos < 0:
         start_pos *= -1
@@ -208,7 +209,7 @@ def _parse_start_pos_y(config):
 
 
 def _parse_max_crop_count(config, key):
-    config = dict(config)
+    config: dict = config
     key = str(key)
 
     max_crop_count = config[key]
@@ -217,6 +218,7 @@ def _parse_max_crop_count(config, key):
         max_crop_count = sys.maxsize
     else:  # elif max_crop_count is not None
         max_crop_count = int(max_crop_count)
+    # end if
 
     if max_crop_count < 0:
         max_crop_count *= -1
@@ -232,8 +234,8 @@ def _parse_max_crop_count_y(config):
     return _parse_max_crop_count(config, "max_crop_count_y")
 
 
-def _find_img_fname(img_name, pos_x, pos_y, crop_res, resize_res):
-    img_name = str(img_name)
+def _find_crop_name(image_name, pos_x, pos_y, crop_res, resize_res):
+    image_name = str(image_name)
     pos_x = int(pos_x)
     pos_y = int(pos_y)
     crop_res = int(crop_res)
@@ -260,10 +262,9 @@ def _find_img_fname(img_name, pos_x, pos_y, crop_res, resize_res):
         f"{now.microsecond:06}"
     )
 
-    fext = ".jpg"
-
-    fname = f"{img_name}{pos_tag}{crop_tag}{resize_tag}{timestamp}{fext}"
-    return fname
+    ext = ".jpg"
+    name = f"{image_name}{pos_tag}{crop_tag}{resize_tag}{timestamp}{ext}"
+    return name
 
 
 def _prep_and_crop(logs):
@@ -279,10 +280,10 @@ def _prep_and_crop(logs):
     # Parse config
     config = _load_json(config_loc)
 
-    imgloc = _parse_imgloc(config)
-    _logln(logs, f"Image location: {imgloc}")
-    outpath = _parse_outpath(config)
-    _logln(logs, f"Output path: {outpath}")
+    image_loc = _parse_image_loc(config)
+    _logln(logs, f"Image location: {image_loc}")
+    out_path = _parse_out_path(config)
+    _logln(logs, f"Output path: {out_path}")
     crop_res = _parse_crop_res(config)
     _logln(logs, f"Crop resolution: {crop_res}")
     resize_res = _parse_resize_res(config)
@@ -306,12 +307,12 @@ def _prep_and_crop(logs):
     _pil_image.MAX_IMAGE_PIXELS = 65535 * 65535
 
     # Read image
-    img = _pil_image_open(imgloc)
-    img_name = _split_text(_basename(imgloc))[0]
+    image = _pil_image_open(image_loc)
+    image_name = _split_text(_basename(image_loc))[0]
     _logln(logs, "Completed loading image")
 
     # Ensure output folder
-    _makedirs(outpath, exist_ok=True)
+    _makedirs(out_path, exist_ok=True)
 
     info = str(
         "-\n"
@@ -333,7 +334,7 @@ def _prep_and_crop(logs):
     total_count = 0
     pos_x = start_pos_x
     pos_y = start_pos_y
-    width, height = img.size
+    width, height = image.size
 
     while count_y < max_crop_count_y and pos_y + crop_res <= height:
         count_x = 0
@@ -341,15 +342,14 @@ def _prep_and_crop(logs):
 
         while count_x < max_crop_count_x and pos_x + crop_res <= width:
             box = (pos_x, pos_y, pos_x + crop_res, pos_y + crop_res)
-            cropped = img.crop(box)
+            cropped = image.crop(box)
 
             if resize_res is not None:
                 cropped = cropped.resize(size=(resize_res, resize_res), resample=_pil_image.BICUBIC)
 
-            fname = _find_img_fname(img_name, pos_x, pos_y, crop_res, resize_res)
-            floc = _join(outpath, fname)
-            cropped.save(floc, quality=95)
-
+            name = _find_crop_name(image_name, pos_x, pos_y, crop_res, resize_res)
+            loc = _join(out_path, name)
+            cropped.save(loc, quality=95)
             total_count += 1
 
             if total_count == 1 or total_count % 500 == 0:
