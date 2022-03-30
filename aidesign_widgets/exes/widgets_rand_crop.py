@@ -120,35 +120,35 @@ log_loc = None
 """Log location."""
 
 
-def _parse_imgloc(config):
-    config = dict(config)
+def _parse_image_loc(config):
+    config: dict = config
 
-    imgloc = config["image_location"]
+    image_loc = config["image_location"]
 
-    if imgloc is None:
+    if image_loc is None:
         raise ValueError("Image location cannot be None")
 
-    imgloc = str(imgloc)
-    imgloc = _abspath(imgloc)
-    return imgloc
+    image_loc = str(image_loc)
+    image_loc = _abspath(image_loc)
+    return image_loc
 
 
-def _parse_outpath(config):
-    config = dict(config)
+def _parse_out_path(config):
+    config: dict = config
 
-    outpath = config["output_path"]
+    out_path = config["output_path"]
 
-    if outpath is None:
+    if out_path is None:
         raise ValueError("Output path cannot be None")
 
-    outpath = str(outpath)
-    outpath = _abspath(outpath)
-    return outpath
+    out_path = str(out_path)
+    out_path = _abspath(out_path)
+    return out_path
 
 
 def _parse_rand_seed(config):
     """Returns manual_seed, seed."""
-    config = dict(config)
+    config: dict = config
 
     manual_seed = config["manual_seed"]
 
@@ -166,7 +166,7 @@ def _parse_rand_seed(config):
 
 
 def _parse_rand_flip(config):
-    config = dict(config)
+    config: dict = config
 
     rand_flip = config["random_flipping"]
 
@@ -180,7 +180,7 @@ def _parse_rand_flip(config):
 
 
 def _parse_crop_res(config):
-    config = dict(config)
+    config: dict = config
 
     crop_res = config["crop_resolution"]
 
@@ -199,7 +199,7 @@ def _parse_crop_res(config):
 
 
 def _parse_resize_res(config):
-    config = dict(config)
+    config: dict = config
 
     resize_res = config["resize_resolution"]
 
@@ -216,7 +216,7 @@ def _parse_resize_res(config):
 
 
 def _parse_crop_count(config):
-    config = dict(config)
+    config: dict = config
 
     crop_count = config["crop_count"]
 
@@ -231,8 +231,8 @@ def _parse_crop_count(config):
     return crop_count
 
 
-def _find_img_fname(img_name, pos_x, pos_y, crop_res, resize_res, flip_around_x, flip_around_y):
-    img_name = str(img_name)
+def _find_crop_name(image_name, pos_x, pos_y, crop_res, resize_res, flip_around_x, flip_around_y):
+    image_name = str(image_name)
     pos_x = int(pos_x)
     pos_y = int(pos_y)
     crop_res = int(crop_res)
@@ -276,10 +276,9 @@ def _find_img_fname(img_name, pos_x, pos_y, crop_res, resize_res, flip_around_x,
         f"{now.microsecond:06}"
     )
 
-    fext = ".jpg"
-
-    fname = f"{img_name}{pos_tag}{crop_tag}{resize_tag}{flip_tag}{timestamp}{fext}"
-    return fname
+    ext = ".jpg"
+    name = f"{image_name}{pos_tag}{crop_tag}{resize_tag}{flip_tag}{timestamp}{ext}"
+    return name
 
 
 def _prep_and_crop(logs):
@@ -295,10 +294,10 @@ def _prep_and_crop(logs):
     # Parse config
     config = _load_json(config_loc)
 
-    imgloc = _parse_imgloc(config)
-    _logln(logs, f"Image location: {imgloc}")
-    outpath = _parse_outpath(config)
-    _logln(logs, f"Output path: {outpath}")
+    image_loc = _parse_image_loc(config)
+    _logln(logs, f"Image location: {image_loc}")
+    out_path = _parse_out_path(config)
+    _logln(logs, f"Output path: {out_path}")
     manual_seed, seed = _parse_rand_seed(config)
     _random_seed(seed)
 
@@ -327,12 +326,12 @@ def _prep_and_crop(logs):
     _pil_image.MAX_IMAGE_PIXELS = 65535 * 65535
 
     # Read image
-    img = _pil_image.open(imgloc)
-    img_name = _split_text(_basename(imgloc))[0]
+    image = _pil_image.open(image_loc)
+    image_name = _split_text(_basename(image_loc))[0]
     _logln(logs, "Completed loading image")
 
     # Ensure output folder
-    _makedirs(outpath, exist_ok=True)
+    _makedirs(out_path, exist_ok=True)
 
     info = str(
         "-\n"
@@ -350,7 +349,7 @@ def _prep_and_crop(logs):
 
     # Start actual cropping
     total_count = 0
-    width, height = img.size
+    width, height = image.size
     min_pos_x = 0
     max_pos_x = width - crop_res
     min_pos_y = 0
@@ -360,18 +359,18 @@ def _prep_and_crop(logs):
         pos_x = _randint(min_pos_x, max_pos_x)
         pos_y = _randint(min_pos_y, max_pos_y)
 
-        flip_around_x = False
-        flip_around_y = False
-
         if rand_flip:
             flip_around_x = _rand_bool()
             flip_around_y = _rand_bool()
+        else:
+            flip_around_x = False
+            flip_around_y = False
+        # end if
 
         box = (pos_x, pos_y, pos_x + crop_res, pos_y + crop_res)
-        fname = _find_img_fname(img_name, pos_x, pos_y, crop_res, resize_res, flip_around_x, flip_around_y)
-        loc = _join(outpath, fname)
-
-        cropped = img.crop(box)
+        name = _find_crop_name(image_name, pos_x, pos_y, crop_res, resize_res, flip_around_x, flip_around_y)
+        loc = _join(out_path, name)
+        cropped = image.crop(box)
 
         if resize_res is not None:
             cropped = cropped.resize(size=(resize_res, resize_res), resample=_pil_image.BICUBIC)
@@ -383,12 +382,10 @@ def _prep_and_crop(logs):
             cropped = cropped.transpose(_pil_image.FLIP_LEFT_RIGHT)
 
         cropped.save(loc, quality=95)
-
         total_count += 1
 
         if total_count == 1 or total_count % 500 == 0:
             _logln(logs, f"Saved {total_count} cropped images")
-
     # end while
 
     _logln(logs, f"Saved {total_count} cropped images")
