@@ -13,7 +13,7 @@ import traceback
 import typing
 
 from os import path as ospath
-from PIL import Image
+from PIL import Image as pil_image
 
 from aidesign_widgets.libs import defaults
 from aidesign_widgets.libs import utils
@@ -34,8 +34,8 @@ _logln = utils.logln
 _logstr = utils.logstr
 _makedirs = os.makedirs
 _now = datetime.datetime.now
-_pil_image = Image
-_pil_image_open = Image.open
+_pil_image = pil_image
+_pil_image_open = pil_image.open
 # _print_exc = traceback.print_exc  # Debug
 _split_text = ospath.splitext
 _stderr = sys.stderr
@@ -304,7 +304,11 @@ def _prep_and_crop(logs):
     _logln(logs, f"Max crop count Y: {max_crop_count_y}")
 
     # Edit PIL max image pixels to avoid zip bomb detection false alarm
-    _pil_image.MAX_IMAGE_PIXELS = 65535 * 65535
+    max_width = 65535
+    max_height = 65535
+    max_pixels = max_width * max_height
+    _pil_image.MAX_IMAGE_PIXELS = max_pixels
+    _logln(logs, f"Tweaked PIL safety max pixels:  Width: {max_width}  Height: {max_height}  Total: {max_pixels}")
 
     # Read image
     image = _pil_image_open(image_loc)
