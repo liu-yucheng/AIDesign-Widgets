@@ -390,9 +390,13 @@ def _prep_and_crop(logs):
 
         if total_count == 1 or total_count % 500 == 0:
             _logln(logs, f"Saved {total_count} cropped images")
+            need_final_prog = False
+        else:
+            need_final_prog = True
     # end while
 
-    _logln(logs, f"Saved {total_count} cropped images")
+    if need_final_prog:
+        _logln(logs, f"Saved {total_count} cropped images")
 
     info = str(
         "-\n"
