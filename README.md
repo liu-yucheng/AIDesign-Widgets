@@ -80,6 +80,12 @@ Follows [PEP8](https://peps.python.org/pep-0008/) with the exceptions shown in t
 }
 ```
 
+# Other `README` Files
+
+Other `README.*` files in this repository are listed below.
+
+- [Widgets application data `README`](aidesign_widgets_default_configs/app_data/README.md)
+
 # Miscellaneous
 ## Developer's Notes :memo: And Warnings :warning:
 ### Notes :memo:
