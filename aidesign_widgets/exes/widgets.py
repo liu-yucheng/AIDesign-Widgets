@@ -6,8 +6,9 @@
 # Last updated by username: liu-yucheng
 
 import copy
-import pkg_resources
 import sys
+
+from aidesign_widgets.libs import pack_info
 
 # Aliases
 
@@ -15,21 +16,6 @@ _argv = sys.argv
 _deepcopy = copy.deepcopy
 _exit = sys.exit
 _stderr = sys.stderr
-
-# -
-# Initialize _version
-
-_version = "<unknown version>"
-
-try:
-    _packages = pkg_resources.require("aidesign-widgets")
-
-    if len(_packages) > 0:
-        _version = _packages[0].version
-
-except Exception as _:
-    pass
-# end try
 
 # -
 
@@ -46,7 +32,7 @@ Help: widgets help
 
 info = fr"""
 
-AIDesign-Widgets (aidesign-widgets) {_version}
+AIDesign-Widgets (aidesign-widgets) {pack_info.ver}
 {usage}
 
 """.strip()
@@ -103,6 +89,10 @@ def _run_command():
         from aidesign_widgets.exes import widgets_path_name
         widgets_path_name.argv_copy = argv_copy
         widgets_path_name.run()
+    elif command == "info":
+        from aidesign_widgets.exes import widgets_info
+        widgets_info.argv_copy = argv_copy
+        widgets_info.run()
     else:
         print(unknown_cmd_info.format(command), file=_stderr)
         _exit(1)
