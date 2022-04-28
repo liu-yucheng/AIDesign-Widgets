@@ -41,6 +41,9 @@ Usage: widgets <command> ...
 help:
     When:   You need help info. For example, now.
     How-to: widgets help
+info:
+    When:   You need package info.
+    How-to: widgets info
 grid-crop:
     When:   You want to crop a large image into small pieces, with the crop positions having a grid-like alignment.
     How-to: widgets grid-crop
