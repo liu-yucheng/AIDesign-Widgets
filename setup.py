@@ -26,9 +26,11 @@ _setup = setuptools.setup
 def main():
     _setup(
         name="aidesign-widgets",
-        version="1.1.11",
-        description="AIDesign Widget Application Collection",
+        version="1.2.0",
         author="Yucheng Liu (From The AIDesign Team)",
+        license="Copyright (C) 2022 Yucheng Liu. GNU GPL3 license.",
+        description="AIDesign widget application collection.",
+        # ----
         packages=_find_packages(),
         entry_points={
             "console_scripts": [
