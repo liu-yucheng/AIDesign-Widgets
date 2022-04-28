@@ -1,4 +1,4 @@
-""""widgets help" command executable."""
+""""widgets info" command executable."""
 
 # Copyright 2022 Yucheng Liu. GNU GPL3 license.
 # GNU GPL3 license copy: https://www.gnu.org/licenses/gpl-3.0.txt
@@ -7,6 +7,8 @@
 
 import copy
 import sys
+
+from aidesign_widgets.libs import pack_info
 
 # Aliases
 
@@ -17,7 +19,7 @@ _stderr = sys.stderr
 
 # -
 
-brief_usage = "widgets help"
+brief_usage = "widgets info"
 """Brief usage."""
 
 usage = fr"""
@@ -30,23 +32,12 @@ Help: widgets help
 
 info = fr"""
 
-Usage: widgets <command> ...
-==== Commands ====
-help:
-    When:   You need help info. For example, now.
-    How-to: widgets help
-info:
-    When:   You need package info.
-    How-to: widgets info
-grid-crop:
-    When:   You want to crop a large image into small pieces, with the crop positions having a grid-like alignment.
-    How-to: widgets grid-crop
-rand-crop:
-    When:   You want to crop a large image into small pieces, with randomly picked crop positions.
-    How-to: widgets rand-crop
-path-name:
-    When:   You want to show a path name as an escaped string with quotes, which can be directly used in JSON.
-    How-to: widgets path-name <relative-path>
+AIDesign-Widgets package info:
+    Package name:   {pack_info.pack_name}
+    Version:        {pack_info.ver}
+    Author:         {pack_info.author}
+    Copyright:      {pack_info.cr}
+    Description:    {pack_info.desc}
 
 """.strip()
 """Primary info to display."""
