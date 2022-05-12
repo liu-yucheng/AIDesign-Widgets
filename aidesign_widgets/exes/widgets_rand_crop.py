@@ -388,7 +388,7 @@ def _prep_and_crop(logs):
         cropped.save(loc, quality=95)
         total_count += 1
 
-        if total_count == 1 or total_count % 500 == 0:
+        if total_count == 1 or total_count % 360 == 0:
             _logln(logs, f"Saved {total_count} cropped images")
             need_final_prog = False
         else:
