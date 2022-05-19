@@ -31,6 +31,8 @@ Configuration item descriptions are listed below.
 
 - `image_location`. Type `str`.
 - `output_path`. Type `str`.
+- `save_flips`. Whether to save the flipped crops. Type `bool`. Supported flips: `"", "x", "y", "xy"`.
+- `save_rotations`. Whether to save the rotated crops. Type `bool`. Supported rotations: `"", "180"`.
 - `crop_resolution`. Cropping resolution. Type `int`. Range [0, ).
 - `resize_resolution`. Type `typing.Union[None, int]`. Range [0, ).
 - `start_position_x`. X-axis start position. Type `int`. Range [0, ).
@@ -49,7 +51,8 @@ Configuration item descriptions are listed below.
 - `image_location`. Type `str`.
 - `output_path`. Type `str`.
 - `manual_seed`. Type `typing.Union[None, int]`. Range [0, ).
-- `random_flipping`. Type `bool`.
+- `random_flipping`. Whether to randomly flip the crops. Type `bool`. Supported flips: `"", "x", "y", "xy"`.
+- `random_rotating`. Whether to randomly rotate the crops. Type `bool`. Supported rotations: `"", "180"`.
 - `crop_resolution`. Cropping resolution. Type `int`. Range [0, ).
 - `resize_resolution`. Type `typing.Union[None, int]`. Range [0, ).
 - `crop_count`. Type `int`. Range [0, ).
