@@ -37,7 +37,7 @@ _makedirs = os.makedirs
 _now = datetime.datetime.now
 _pil_image = pil_image
 # _print_exc = traceback.print_exc  # Debug
-_rand_bool = utils.rand_bool
+_rand_choice = random.choice
 _randint = random.randint
 _random_seed = random.seed
 _split_text = ospath.splitext
@@ -169,14 +169,24 @@ def _parse_rand_flip(config):
     config: dict = config
 
     rand_flip = config["random_flipping"]
-
-    if rand_flip is None:
-        rand_flip = False
-    else:  # elif rand_flip is not None:
-        rand_flip = bool(rand_flip)
-    # end if
+    rand_flip = bool(rand_flip)
 
     return rand_flip
+
+
+def _parse_rand_rot(config):
+    config: dict = config
+
+    rand_rot_key = "random_rotating"
+
+    if rand_rot_key in config:
+        rand_rot = config[rand_rot_key]
+        rand_rot = bool(rand_rot)
+    else:
+        rand_rot = False
+    # end if
+
+    return rand_rot
 
 
 def _parse_crop_res(config):
@@ -231,7 +241,7 @@ def _parse_crop_count(config):
     return crop_count
 
 
-def _find_crop_name(image_name, pos_x, pos_y, crop_res, resize_res, flip_around_x, flip_around_y):
+def _find_crop_name(image_name, pos_x, pos_y, crop_res, resize_res, flip, rot):
     image_name = str(image_name)
     pos_x = int(pos_x)
     pos_y = int(pos_y)
@@ -243,8 +253,8 @@ def _find_crop_name(image_name, pos_x, pos_y, crop_res, resize_res, flip_around_
         resize_res = int(resize_res)
     # end if
 
-    flip_around_x = bool(flip_around_x)
-    flip_around_y = bool(flip_around_y)
+    flip = str(flip)
+    rot = str(rot)
 
     pos_tag = f"-At-{pos_x}-{pos_y}"
     crop_tag = f"-Crop-{crop_res}"
@@ -255,18 +265,16 @@ def _find_crop_name(image_name, pos_x, pos_y, crop_res, resize_res, flip_around_
         resize_tag = f"-Resize-{resize_res}"
     # end if
 
-    if flip_around_x or flip_around_y:
-        flip_axes = ""
-
-        if flip_around_x:
-            flip_axes += "X"
-
-        if flip_around_y:
-            flip_axes += "Y"
-
-        flip_tag = f"-FlippedAround-{flip_axes}"
-    else:  # elif not (flip_around_x or flip_around_y):
+    if flip != "":
+        flip_tag = f"Flip-{flip}"
+    else:
         flip_tag = ""
+    # end if
+
+    if rot != "":
+        rot_tag = f"Rotation-{rot}"
+    else:
+        rot_tag = ""
     # end if
 
     now = _now()
@@ -277,7 +285,7 @@ def _find_crop_name(image_name, pos_x, pos_y, crop_res, resize_res, flip_around_
     )
 
     ext = ".jpg"
-    name = f"{image_name}{pos_tag}{crop_tag}{resize_tag}{flip_tag}{timestamp}{ext}"
+    name = f"{image_name}{pos_tag}{crop_tag}{resize_tag}{flip_tag}{rot_tag}{timestamp}{ext}"
     return name
 
 
@@ -308,7 +316,23 @@ def _prep_and_crop(logs):
     # end if
 
     rand_flip = _parse_rand_flip(config)
-    _logln(logs, f"Random flipping mode: {rand_flip}")
+    _logln(logs, f"Random flipping: {rand_flip}")
+
+    if rand_flip:
+        flips = ["", "x", "y", "xy"]
+    else:
+        flips = [""]
+    # end if
+
+    rand_rot = _parse_rand_rot(config)
+    _logln(logs, f"Random rotating: {rand_rot}")
+
+    if rand_rot:
+        rots = ["", "180"]
+    else:
+        rots = [""]
+    # end if
+
     crop_res = _parse_crop_res(config)
     _logln(logs, f"Crop resolution: {crop_res}")
     resize_res = _parse_resize_res(config)
@@ -363,32 +387,30 @@ def _prep_and_crop(logs):
         pos_x = _randint(min_pos_x, max_pos_x)
         pos_y = _randint(min_pos_y, max_pos_y)
 
-        if rand_flip:
-            flip_around_x = _rand_bool()
-            flip_around_y = _rand_bool()
-        else:
-            flip_around_x = False
-            flip_around_y = False
-        # end if
+        flip = _rand_choice(flips)
+        rot = _rand_choice(rots)
 
         box = (pos_x, pos_y, pos_x + crop_res, pos_y + crop_res)
-        name = _find_crop_name(image_name, pos_x, pos_y, crop_res, resize_res, flip_around_x, flip_around_y)
+        name = _find_crop_name(image_name, pos_x, pos_y, crop_res, resize_res, flip, rot)
         loc = _join(out_path, name)
-        cropped = image.crop(box)
+        crop = image.crop(box)
 
         if resize_res is not None:
-            cropped = cropped.resize(size=(resize_res, resize_res), resample=_pil_image.BICUBIC)
+            crop = crop.resize(size=(resize_res, resize_res), resample=_pil_image.BICUBIC)
 
-        if flip_around_x:
-            cropped = cropped.transpose(_pil_image.FLIP_TOP_BOTTOM)
+        if "x" in flip:
+            crop = crop.transpose(_pil_image.FLIP_TOP_BOTTOM)
 
-        if flip_around_y:
-            cropped = cropped.transpose(_pil_image.FLIP_LEFT_RIGHT)
+        if "y" in flip:
+            crop = crop.transpose(_pil_image.FLIP_LEFT_RIGHT)
 
-        cropped.save(loc, quality=95)
+        if rot == "180":
+            crop = crop.transpose(_pil_image.ROTATE_180)
+
+        crop.save(loc, quality=95)
         total_count += 1
 
-        if total_count == 1 or total_count % 360 == 0:
+        if total_count == 1 or total_count % 256 == 0:
             _logln(logs, f"Saved {total_count} cropped images")
             need_final_prog = False
         else:
