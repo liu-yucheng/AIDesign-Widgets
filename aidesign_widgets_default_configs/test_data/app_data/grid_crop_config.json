@@ -1,6 +1,8 @@
 {
     "image_location": null,
     "output_path": null,
+    "save_flips": true,
+    "save_rotations": true,
     "crop_resolution": 64,
     "resize_resolution": 64,
     "start_position_x": 0,

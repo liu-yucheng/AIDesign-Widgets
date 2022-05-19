@@ -3,6 +3,7 @@
     "output_path": null,
     "manual_seed": null,
     "random_flipping": true,
+    "random_rotating": true,
     "crop_resolution": 64,
     "resize_resolution": 64,
     "crop_count": 16

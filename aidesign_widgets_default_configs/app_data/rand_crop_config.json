@@ -2,7 +2,8 @@
     "image_location": null,
     "output_path": null,
     "manual_seed": null,
-    "random_flipping": true,
+    "random_flipping": false,
+    "random_rotating": false,
     "crop_resolution": 64,
     "resize_resolution": null,
     "crop_count": 64
