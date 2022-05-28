@@ -23,6 +23,7 @@ from aidesign_widgets.libs import utils
 _abspath = ospath.abspath
 _argv = sys.argv
 _basename = ospath.basename
+_clamp_int = utils.clamp_int
 _deepcopy = copy.deepcopy
 _exit = sys.exit
 _flush_logs = utils.flushlogs
@@ -212,6 +213,22 @@ def _parse_resize_res(config):
     return resize_res
 
 
+def _parse_crop_quality(config):
+    config: dict = config
+
+    crop_quality_key = "crop_quality"
+
+    if crop_quality_key in config:
+        crop_quality = config[crop_quality_key]
+        crop_quality = int(crop_quality)
+        crop_quality = _clamp_int(crop_quality, 0, 100)
+    else:
+        crop_quality = 95
+    # end if
+
+    return crop_quality
+
+
 def _parse_start_pos(config, key):
     config: dict = config
     key = str(key)
@@ -358,6 +375,8 @@ def _prep_and_crop(logs):
         _logln(logs, f"Resize resolution: {resize_res}")
     # end if
 
+    crop_quality = _parse_crop_quality(config)
+    _logln(logs, f"Crop quality: {crop_quality}")
     start_pos_x = _parse_start_pos_x(config)
     _logln(logs, f"Start position X: {start_pos_x}")
     start_pos_y = _parse_start_pos_y(config)
@@ -429,7 +448,7 @@ def _prep_and_crop(logs):
 
                     name = _find_crop_name(image_name, pos_x, pos_y, crop_res, resize_res, flip, rot)
                     loc = _join(out_path, name)
-                    crop.save(loc, quality=95)
+                    crop.save(loc, format="jpeg", quality=crop_quality)
                     total_count += 1
 
                     if total_count == 1 or total_count % 256 == 0:
