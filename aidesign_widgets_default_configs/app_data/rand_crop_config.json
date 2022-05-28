@@ -6,5 +6,6 @@
     "random_rotating": false,
     "crop_resolution": 64,
     "resize_resolution": null,
+    "crop_quality": 95,
     "crop_count": 64
 }
