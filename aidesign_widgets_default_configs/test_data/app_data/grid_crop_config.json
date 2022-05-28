@@ -5,6 +5,7 @@
     "save_rotations": true,
     "crop_resolution": 64,
     "resize_resolution": 64,
+    "crop_quality": 75,
     "start_position_x": 0,
     "start_position_y": 0,
     "max_crop_count_x": null,
