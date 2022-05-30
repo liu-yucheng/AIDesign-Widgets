@@ -93,6 +93,10 @@ def _run_command():
         from aidesign_widgets.exes import widgets_info
         widgets_info.argv_copy = argv_copy
         widgets_info.run()
+    elif command == "bulk-crop":
+        from aidesign_widgets.exes import widgets_bulk_crop
+        widgets_bulk_crop.argv_copy = argv_copy
+        widgets_bulk_crop.run()
     else:
         print(unknown_cmd_info.format(command), file=_stderr)
         _exit(1)
