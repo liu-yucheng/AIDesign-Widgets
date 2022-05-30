@@ -1,0 +1,24 @@
+{
+    "bulk_input_path": null,
+    "bulk_output_path": null,
+    "grid_crop_config_overrides": {
+        "save_flips": false,
+        "save_rotations": false,
+        "crop_resolution": 64,
+        "resize_resolution": null,
+        "crop_quality": 95,
+        "start_position_x": 0,
+        "start_position_y": 0,
+        "max_crop_count_x": null,
+        "max_crop_count_y": null
+    },
+    "rand_crop_config_overrides": {
+        "manual_seed": null,
+        "random_flipping": false,
+        "random_rotating": false,
+        "crop_resolution": 64,
+        "resize_resolution": null,
+        "crop_quality": 95,
+        "crop_count": 64
+    }
+}

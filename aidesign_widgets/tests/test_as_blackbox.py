@@ -17,13 +17,15 @@ import unittest
 
 from os import path as ospath
 
+# Aliases
+
 _copytree = shutil.copytree
 _create_subprocess_shell = asyncio.create_subprocess_shell
 _dump = json.dump
 _exists = ospath.exists
 _IO = typing.IO
 _isdir = ospath.isdir
-# _isfile = ospath.isfile
+_isfile = ospath.isfile
 _join = ospath.join
 _listdir = os.listdir
 _load = json.load
@@ -37,6 +39,8 @@ _run = asyncio.run
 _TestCase = unittest.TestCase
 _Thread = threading.Thread
 
+# End
+
 _timeout = float(30)
 
 _tests_path = str(_Path(__file__).parent)
@@ -49,22 +53,28 @@ _default_test_data_path = _join(_default_configs_path, "test_data")
 _app_data_path = _join(_repo_path, "aidesign_widgets_app_data")
 _grid_crop_config_loc = _join(_app_data_path, "grid_crop_config.json")
 _rand_crop_config_loc = _join(_app_data_path, "rand_crop_config.json")
+_bulk_crop_config_loc = _join(_app_data_path, "bulk_crop_config.json")
 
 _default_app_data_path = _join(_default_test_data_path, "app_data")
 _default_grid_crop_config_loc = _join(_default_app_data_path, "grid_crop_config.json")
 _default_rand_crop_config_loc = _join(_default_app_data_path, "rand_crop_config.json")
+_default_bulk_crop_config_loc = _join(_default_app_data_path, "bulk_crop_config.json")
 
-_default_tocrop_path = _join(_default_test_data_path, "to_crop")
+_default_to_crop_path = _join(_default_test_data_path, "to_crop")
+_default_to_bulk_crop_path = _join(_default_test_data_path, "to_bulk_crop")
 
 _log_loc = _join(_test_data_path, "log.txt")
 
-_tocrop_path = _join(_test_data_path, "to_crop")
-_tocrop1_loc = _join(_tocrop_path, "to_crop_1.jpg")
+_to_crop_path = _join(_test_data_path, "to_crop")
+_to_crop_1_loc = _join(_to_crop_path, "to_crop_1.jpg")
+_to_bulk_crop_path = _join(_test_data_path, "to_bulk_crop")
 
 _cropped_path = _join(_test_data_path, "cropped")
+_bulk_cropped_path = _join(_test_data_path, "bulk_cropped")
 
 _grid_crop_config_backup_loc = _join(_test_data_path, "grid_crop_config_backup.json")
 _rand_crop_config_backup_loc = _join(_test_data_path, "rand_crop_config_backup.json")
+_bulk_crop_config_backup_loc = _join(_test_data_path, "bulk_crop_config_backup.json")
 
 
 def _fix_newline_format(instr):
@@ -258,6 +268,11 @@ class _TestCmd(_TestCase):
         default_config = _load_json(_default_rand_crop_config_loc)
         _save_json(default_config, _rand_crop_config_loc)
 
+        config = _load_json(_bulk_crop_config_loc)
+        _save_json(config, _bulk_crop_config_backup_loc)
+        default_config = _load_json(_default_bulk_crop_config_loc)
+        _save_json(default_config, _bulk_crop_config_loc)
+
     def _restore_cmd_configs(self):
         config_backup = _load_json(_grid_crop_config_backup_loc)
         _save_json(config_backup, _grid_crop_config_loc)
@@ -270,6 +285,12 @@ class _TestCmd(_TestCase):
 
         if _exists(_rand_crop_config_backup_loc):
             _remove(_rand_crop_config_backup_loc)
+
+        config_backup = _load_json(_bulk_crop_config_backup_loc)
+        _save_json(config_backup, _bulk_crop_config_loc)
+
+        if _exists(_bulk_crop_config_backup_loc):
+            _remove(_bulk_crop_config_backup_loc)
 
 
 class _TestSimpleCmd(_TestCmd):
@@ -354,12 +375,12 @@ class TestWidgetsGridCrop(_TestCmd):
         self._backup_cmd_configs()
 
         _rmtree(_cropped_path, ignore_errors=True)
-        _rmtree(_tocrop_path, ignore_errors=True)
+        _rmtree(_to_crop_path, ignore_errors=True)
         _makedirs(_cropped_path, exist_ok=True)
-        _copytree(_default_tocrop_path, _tocrop_path)
+        _copytree(_default_to_crop_path, _to_crop_path)
 
         config = _load_json(_grid_crop_config_loc)
-        config["image_location"] = _tocrop1_loc
+        config["image_location"] = _to_crop_1_loc
         config["output_path"] = _cropped_path
         _save_json(config, _grid_crop_config_loc)
 
@@ -369,7 +390,7 @@ class TestWidgetsGridCrop(_TestCmd):
         self._restore_cmd_configs()
 
         _rmtree(_cropped_path, ignore_errors=True)
-        _rmtree(_tocrop_path, ignore_errors=True)
+        _rmtree(_to_crop_path, ignore_errors=True)
 
     def test_norm(self):
         """Tests the normal use case."""
@@ -395,25 +416,29 @@ class TestWidgetsGridCrop(_TestCmd):
         format_incorrect_info = "results format incorrect"
 
         isdir = _isdir(_cropped_path)
-        fail_msg = "{} is not a directory; {}".format(_tocrop_path, format_incorrect_info)
+        fail_msg = "{} is not a directory; {}".format(_cropped_path, format_incorrect_info)
         self.assertTrue(isdir, fail_msg)
 
-        regexs_each = [
-            _re_compile(r".*-At-.*-Crop-.*(-Resize-.*)?-Time-.*\.jpg"),
+        regexs = [
+            _re_compile(r".*-At-.*-Crop-.*(-Resize-.*)?(-Flip-(x|y|xy))?(-Rotation-(x|y|xy))?-Time-.*\.jpg")
         ]
+        names = _listdir(_cropped_path)
 
-        contents = _listdir(_cropped_path)
+        for name in names:
+            obj_path = _join(_cropped_path, name)
+            isfile = _isfile(obj_path)
+            fail_msg = "The object at path {} is not a file; {}".format(obj_path, format_incorrect_info)
+            self.assertTrue(isfile, fail_msg)
 
-        for regex in regexs_each:
+            for regex in regexs:
+                matched = bool(regex.match(name))
 
-            for fname in contents:
-                matched = bool(regex.match(fname))
                 fail_msg = "File name {} in {} does not match pattern {}; {}".format(
-                    fname, _cropped_path, str(regex), format_incorrect_info
+                    name, _cropped_path, str(regex), format_incorrect_info
                 )
+
                 self.assertTrue(matched, fail_msg)
             # end for
-
         # end for
 
         self._log_method_end(method_name)
@@ -428,12 +453,12 @@ class TestWidgetsRandCrop(_TestCmd):
         self._backup_cmd_configs()
 
         _rmtree(_cropped_path, ignore_errors=True)
-        _rmtree(_tocrop_path, ignore_errors=True)
+        _rmtree(_to_crop_path, ignore_errors=True)
         _makedirs(_cropped_path, exist_ok=True)
-        _copytree(_default_tocrop_path, _tocrop_path)
+        _copytree(_default_to_crop_path, _to_crop_path)
 
         config = _load_json(_rand_crop_config_loc)
-        config["image_location"] = _tocrop1_loc
+        config["image_location"] = _to_crop_1_loc
         config["output_path"] = _cropped_path
         _save_json(config, _rand_crop_config_loc)
 
@@ -443,7 +468,7 @@ class TestWidgetsRandCrop(_TestCmd):
         self._restore_cmd_configs()
 
         _rmtree(_cropped_path, ignore_errors=True)
-        _rmtree(_tocrop_path, ignore_errors=True)
+        _rmtree(_to_crop_path, ignore_errors=True)
 
     def test_norm(self):
         """Tests the normal use case."""
@@ -469,25 +494,204 @@ class TestWidgetsRandCrop(_TestCmd):
         format_incorrect_info = "results format incorrect"
 
         isdir = _isdir(_cropped_path)
-        fail_msg = "{} is not a directory; {}".format(_tocrop_path, format_incorrect_info)
+        fail_msg = "{} is not a directory; {}".format(_cropped_path, format_incorrect_info)
         self.assertTrue(isdir, fail_msg)
 
-        regexs_each = [
-            _re_compile(r".*-At-.*-Crop-.*(-Resize-.*)?(-FlippedAround-(X|Y|XY))?-Time-.*\.jpg"),
+        regexs = [
+            _re_compile(r".*-At-.*-Crop-.*(-Resize-.*)?(-Flip-(x|y|xy))?(-Rotation-(x|y|xy))?-Time-.*\.jpg")
+        ]
+        names = _listdir(_cropped_path)
+
+        for name in names:
+            obj_path = _join(_cropped_path, name)
+            isfile = _isfile(obj_path)
+            fail_msg = "The object at path {} is not a file; {}".format(obj_path, format_incorrect_info)
+            self.assertTrue(isfile, fail_msg)
+
+            for regex in regexs:
+                matched = bool(regex.match(name))
+
+                fail_msg = "File name {} in {} does not match pattern {}; {}".format(
+                    name, _cropped_path, str(regex), format_incorrect_info
+                )
+
+                self.assertTrue(matched, fail_msg)
+            # end for
+        # end for
+
+        self._log_method_end(method_name)
+
+
+class TestWidgetsBulkCrop(_TestCmd):
+    """Tests for the "widgets bulk-crop <command> ..." command."""
+
+    def setUp(self):
+        """Sets up before the tests."""
+        super().setUp()
+        self._backup_cmd_configs()
+
+        _rmtree(_bulk_cropped_path, ignore_errors=True)
+        _rmtree(_to_bulk_crop_path, ignore_errors=True)
+        _makedirs(_bulk_cropped_path, exist_ok=True)
+        _copytree(_default_to_bulk_crop_path, _to_bulk_crop_path)
+
+        config = _load_json(_bulk_crop_config_loc)
+        config["bulk_input_path"] = _to_bulk_crop_path
+        config["bulk_output_path"] = _bulk_cropped_path
+        _save_json(config, _bulk_crop_config_loc)
+
+    def tearDown(self):
+        """Tears down after the tests."""
+        super().tearDown()
+        self._restore_cmd_configs()
+
+        _rmtree(_bulk_cropped_path, ignore_errors=True)
+        _rmtree(_to_bulk_crop_path, ignore_errors=True)
+
+    def test_norm_grid(self):
+        """Tests the normal use case for the "grid" subcommand."""
+        method_name = self.test_norm_grid.__name__
+        self._log_method_start(method_name)
+
+        cmd = "widgets bulk-crop grid"
+        instr = "\n"
+        thread = _FuncThread(target=_run_cmd, args=[cmd, instr])
+        thread.start()
+        exit_code, out, err = thread.join(_timeout)
+        timed_out = thread.is_alive()
+
+        self._log_cmdout(cmd, "stdout", out)
+        self._log_cmdout(cmd, "stderr", err)
+
+        fail_msg = "Running \"{}\" results in a timeout".format(cmd)
+        self.assertTrue(timed_out is False, fail_msg)
+
+        fail_msg = "Running \"{}\" results in an unexpected exit code: {}".format(cmd, exit_code)
+        self.assertTrue(exit_code == 0, fail_msg)
+
+        format_incorrect_info = "results format incorrect"
+
+        isdir = _isdir(_bulk_cropped_path)
+        fail_msg = "{} is not a directory; {}".format(_bulk_cropped_path, format_incorrect_info)
+        self.assertTrue(isdir, fail_msg)
+
+        regexs_depth_1 = [
+            _re_compile(r"GridCrop-.*")
+        ]
+        regexs_depth_2 = [
+            _re_compile(r".*-At-.*-Crop-.*(-Resize-.*)?(-Flip-(x|y|xy))?(-Rotation-(x|y|xy))?-Time-.*\.jpg")
         ]
 
-        contents = _listdir(_cropped_path)
+        names_depth_1 = _listdir(_bulk_cropped_path)
 
-        for regex in regexs_each:
+        for name_depth_1 in names_depth_1:
+            obj_path_depth_1 = _join(_bulk_cropped_path, name_depth_1)
+            isdir_depth_1 = _isdir(obj_path_depth_1)
+            fail_msg = "The object at path {} is not a directory; {}".format(obj_path_depth_1, format_incorrect_info)
+            self.assertTrue(isdir_depth_1, fail_msg)
 
-            for fname in contents:
-                matched = bool(regex.match(fname))
-                fail_msg = "File name {} in {} does not match pattern {}; {}".format(
-                    fname, _cropped_path, str(regex), format_incorrect_info
+            for regex_depth_1 in regexs_depth_1:
+                matched = bool(regex_depth_1.match(name_depth_1))
+
+                fail_msg = "Folder name {} in {} does not match pattern {}; {}".format(
+                    name_depth_1, _bulk_cropped_path, str(regex_depth_1), format_incorrect_info
                 )
+
                 self.assertTrue(matched, fail_msg)
             # end for
 
+            names_depth_2 = _listdir(obj_path_depth_1)
+
+            for name_depth_2 in names_depth_2:
+                obj_path_depth_2 = _join(_bulk_cropped_path, name_depth_1, name_depth_2)
+                isfile_depth_2 = _isfile(obj_path_depth_2)
+                fail_msg = "The object at path {} is not a file; {}".format(obj_path_depth_2, format_incorrect_info)
+                self.assertTrue(isfile_depth_2, fail_msg)
+
+                for regex_depth_2 in regexs_depth_2:
+                    matched = bool(regex_depth_2.match(name_depth_2))
+
+                    fail_msg = "File name {} in {} does not match pattern {}; {}".format(
+                        name_depth_2, obj_path_depth_1, str(regex_depth_2), format_incorrect_info
+                    )
+
+                    self.assertTrue(matched, fail_msg)
+                # end for
+            # end for
+        # end for
+
+        self._log_method_end(method_name)
+
+    def test_norm_rand(self):
+        """Tests the normal use case for the "rand" subcommand."""
+        method_name = self.test_norm_grid.__name__
+        self._log_method_start(method_name)
+
+        cmd = "widgets bulk-crop rand"
+        instr = "\n"
+        thread = _FuncThread(target=_run_cmd, args=[cmd, instr])
+        thread.start()
+        exit_code, out, err = thread.join(_timeout)
+        timed_out = thread.is_alive()
+
+        self._log_cmdout(cmd, "stdout", out)
+        self._log_cmdout(cmd, "stderr", err)
+
+        fail_msg = "Running \"{}\" results in a timeout".format(cmd)
+        self.assertTrue(timed_out is False, fail_msg)
+
+        fail_msg = "Running \"{}\" results in an unexpected exit code: {}".format(cmd, exit_code)
+        self.assertTrue(exit_code == 0, fail_msg)
+
+        format_incorrect_info = "results format incorrect"
+
+        isdir = _isdir(_bulk_cropped_path)
+        fail_msg = "{} is not a directory; {}".format(_bulk_cropped_path, format_incorrect_info)
+        self.assertTrue(isdir, fail_msg)
+
+        regexs_depth_1 = [
+            _re_compile(r"RandCrop-.*")
+        ]
+        regexs_depth_2 = [
+            _re_compile(r".*-At-.*-Crop-.*(-Resize-.*)?(-Flip-(x|y|xy))?(-Rotation-(x|y|xy))?-Time-.*\.jpg")
+        ]
+
+        names_depth_1 = _listdir(_bulk_cropped_path)
+
+        for name_depth_1 in names_depth_1:
+            obj_path_depth_1 = _join(_bulk_cropped_path, name_depth_1)
+            isdir_depth_1 = _isdir(obj_path_depth_1)
+            fail_msg = "The object at path {} is not a directory; {}".format(obj_path_depth_1, format_incorrect_info)
+            self.assertTrue(isdir_depth_1, fail_msg)
+
+            for regex_depth_1 in regexs_depth_1:
+                matched = bool(regex_depth_1.match(name_depth_1))
+
+                fail_msg = "Folder name {} in {} does not match pattern {}; {}".format(
+                    name_depth_1, _bulk_cropped_path, str(regex_depth_1), format_incorrect_info
+                )
+
+                self.assertTrue(matched, fail_msg)
+            # end for
+
+            names_depth_2 = _listdir(obj_path_depth_1)
+
+            for name_depth_2 in names_depth_2:
+                obj_path_depth_2 = _join(_bulk_cropped_path, name_depth_1, name_depth_2)
+                isfile_depth_2 = _isfile(obj_path_depth_2)
+                fail_msg = "The object at path {} is not a file; {}".format(obj_path_depth_2, format_incorrect_info)
+                self.assertTrue(isfile_depth_2, fail_msg)
+
+                for regex_depth_2 in regexs_depth_2:
+                    matched = bool(regex_depth_2.match(name_depth_2))
+
+                    fail_msg = "File name {} in {} does not match pattern {}; {}".format(
+                        name_depth_2, obj_path_depth_1, str(regex_depth_2), format_incorrect_info
+                    )
+
+                    self.assertTrue(matched, fail_msg)
+                # end for
+            # end for
         # end for
 
         self._log_method_end(method_name)

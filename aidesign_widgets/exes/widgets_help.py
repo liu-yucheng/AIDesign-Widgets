@@ -49,6 +49,16 @@ rand-crop:
 path-name:
     When:   You want to show a path name as an escaped string with quotes, which can be directly used in JSON.
     How-to: widgets path-name <relative-path>
+bulk-crop:
+    When:   You want to crop all the images in a folder and save the crops into subfolders of another folder.
+    How-to: widgets bulk-crop <command> ...
+    ==== Commands ====
+    grid:
+        When:   You want to start a bulk grid cropping session.
+        How-to: widgets bulk-crop grid
+    rand:
+        When:   You want to start a bulk random cropping session.
+        How-to: widgets bulk-crop rand
 
 """.strip()
 """Primary info to display."""
