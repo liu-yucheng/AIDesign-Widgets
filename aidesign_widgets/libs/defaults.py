@@ -31,3 +31,8 @@ grid_crop_config_name = "grid_crop_config.json"
 """"grid-crop" config name."""
 rand_crop_config_name = "rand_crop_config.json"
 """"rand-crop" config name."""
+bulk_crop_config_name = "bulk_crop_config.json"
+""""bulk-crop" config name."""
+
+bulk_crop_backups_path = _join(app_data_path, "bulk_crop_backups")
+""""bulk-crop" backup path."""

@@ -307,6 +307,7 @@ def _find_crop_name(image_name, pos_x, pos_y, crop_res, resize_res, flip, rot):
 
 
 def _prep_and_crop(logs):
+    global config_loc
     logs: list[_IO] = logs
 
     info = str(
@@ -448,7 +449,8 @@ def _prep_and_crop(logs):
     _flushlogs(logs)
 
 
-def _start_cropping():
+def start_cropping():
+    """Starts the cropping."""
     global log_loc
 
     start_time = _now()
@@ -525,7 +527,7 @@ def run():
             print(will_start_info.format(log_loc))
 
             try:
-                _start_cropping()
+                start_cropping()
             except BaseException as base_exception:
                 # _print_exc()  # Debug
 
