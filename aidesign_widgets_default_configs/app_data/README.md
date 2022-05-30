@@ -21,6 +21,21 @@ This file itself.
 
 Texts.
 
+## `bulk_crop_config.json`
+
+Bulk cropping configuration.
+
+Configuration items. Type `dict[str, typing.Union[dict, list, str, bool, int, float, None]]`.
+
+Configuration item descriptions are listed below.
+
+- `bulk_input_path`. Type `str`.
+- `bulk_output_path`. Type `str`.
+- `grid_crop_config_overrides`. Type `dict`.
+  - See the `grid_crop_config.json` section for `dict` item descriptions.
+- `rand_crop_config_overrides`. Type `dict`.
+  - See the `rand_crop_config.json` section for `dict` item descriptions.
+
 ## `grid_crop_config.json`
 
 Grid cropping configuration.
