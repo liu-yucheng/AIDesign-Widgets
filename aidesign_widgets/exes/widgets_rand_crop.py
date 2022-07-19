@@ -283,13 +283,13 @@ def _find_crop_name(image_name, pos_x, pos_y, crop_res, resize_res, flip, rot):
     # end if
 
     if flip != "":
-        flip_tag = f"Flip-{flip}"
+        flip_tag = f"-Flip-{flip}"
     else:
         flip_tag = ""
     # end if
 
     if rot != "":
-        rot_tag = f"Rotation-{rot}"
+        rot_tag = f"-Rotation-{rot}"
     else:
         rot_tag = ""
     # end if
