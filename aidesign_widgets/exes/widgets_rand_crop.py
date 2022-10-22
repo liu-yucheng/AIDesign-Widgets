@@ -405,6 +405,9 @@ def _prep_and_crop(logs):
     need_final_prog = False
 
     while total_count < crop_count:
+        if (max_pos_x <= min_pos_x) or (max_pos_y <= min_pos_y):
+            break
+
         pos_x = _randint(min_pos_x, max_pos_x)
         pos_y = _randint(min_pos_y, max_pos_y)
 
