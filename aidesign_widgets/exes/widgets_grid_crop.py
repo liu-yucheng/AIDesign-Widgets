@@ -423,6 +423,7 @@ def _prep_and_crop(logs):
     pos_x = start_pos_x
     pos_y = start_pos_y
     width, height = image.size
+    need_final_prog = False
 
     while count_y < max_crop_count_y and pos_y + crop_res <= height:
         count_x = 0
