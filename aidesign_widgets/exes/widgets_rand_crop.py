@@ -402,6 +402,7 @@ def _prep_and_crop(logs):
     max_pos_x = width - crop_res
     min_pos_y = 0
     max_pos_y = height - crop_res
+    need_final_prog = False
 
     while total_count < crop_count:
         pos_x = _randint(min_pos_x, max_pos_x)
