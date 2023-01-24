@@ -398,14 +398,17 @@ def _prep_and_crop(logs):
     # Start actual cropping
     total_count = 0
     width, height = image.size
+
+    # min_pos_x, max_pos_x, min_pos_y, max_pos_y are inclusive
     min_pos_x = 0
     max_pos_x = width - crop_res
     min_pos_y = 0
     max_pos_y = height - crop_res
+
     need_final_prog = False
 
     while total_count < crop_count:
-        if (max_pos_x <= min_pos_x) or (max_pos_y <= min_pos_y):
+        if (max_pos_x < min_pos_x) or (max_pos_y < min_pos_y):
             break
 
         pos_x = _randint(min_pos_x, max_pos_x)
