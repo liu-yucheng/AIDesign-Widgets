@@ -7,7 +7,7 @@ The "entry_points" parameter of the setup function specifies the function to cal
     corresponding command via the command line.
 """
 
-# Copyright 2022 Yucheng Liu. GNU GPL3 license.
+# Copyright 2022-2023 Yucheng Liu. GNU GPL3 license.
 # GNU GPL3 license copy: https://www.gnu.org/licenses/gpl-3.0.txt
 # First added by username: liu-yucheng
 # Last updated by username: liu-yucheng
@@ -26,9 +26,9 @@ _setup = setuptools.setup
 def main():
     _setup(
         name="aidesign-widgets",
-        version="1.5.6",
+        version="1.6.0",
         author="Yucheng Liu (From The AIDesign Team)",
-        license="Copyright (C) 2022 Yucheng Liu. GNU GPL3 license.",
+        license="Copyright (C) 2022-2023 Yucheng Liu. GNU GPL3 license.",
         description="AIDesign widget application collection.",
         # ----
         packages=_find_packages(),
